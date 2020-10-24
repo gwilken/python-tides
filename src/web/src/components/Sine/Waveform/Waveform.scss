@@ -1,7 +1,9 @@
 .waveform-container {
+  height: 50px;
+  margin: 15px 0;
   canvas {
-    // background-color: #badefd;
+    background-color: #badefd;
     width: 500px;
-    height: 100px;
+    height: 50px;
   }
 }
