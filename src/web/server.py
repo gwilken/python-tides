@@ -1,54 +1,50 @@
 from flask import Flask, jsonify, render_template, send_file, send_from_directory
 
 from markupsafe import escape
-import redis
 import json
+import os
+
+ENV = os.getenv('FLASK_ENV')
 
 app = Flask(__name__)
 
-def connect_redis():
-  r = None
-  try:
-    r = redis.Redis(host='127.0.0.1', port=6379, decode_responses=True)
-    print('[ build-db ] - Connected to Redis.')
-    return r
-  
-  except Error as e:
-    print(e)
-
-  return r
-
-
-r = connect_redis()
-
-
-
 ######### ROUTES BELOW ###########
 
+@app.context_processor
+def get_env():
+  return dict(env=ENV)
 
 @app.route('/')
-@app.route('/<name>')
-def home(name=None):
-  return render_template('skeleton.template', name=name)
+def home():
+  return send_file('./build/index.html')
 
+@app.route('/<path:filename>')
+def static_home(filename):
+  return send_from_directory('./build', filename)
 
-@app.route('/station/<id>')
-def get_id(id):
-  # data = r.hgetall(id)
-  # json_data = jsonify(str(data))
-  # print(json_data)
-  # data_json = json.dumps(data)
-  return send_file(f'/harmonics/{id}.json')
+@app.route('/stations/<path:filename>')
+def get_station(filename):
+  return send_from_directory('./public/stations', filename)
 
+@app.route('/harmonics/<path:filename>')
+def get_harmonic(filename):
+  return send_from_directory('./public/harmonics', filename)
+
+@app.route('/static/css/<path:filename>')
+def static_css(filename):
+    return send_from_directory('./build/static/css', filename)
+
+@app.route('/static/js/<path:filename>')
+def static_js(filename):
+    return send_from_directory('./build/static/js', filename)
+
+@app.route('/static/media/<path:filename>')
+def static_media(filename):
+    return send_from_directory('./build/static/media', filename)
 
 @app.route('/ping')
 def pong():
   return 'Pong!'
-
-
-@app.route("/static/<path:filename>")
-def staticfiles(filename):
-    return send_from_directory('/static', filename)
 
 
 ####### END ROUTES #########
