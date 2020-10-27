@@ -1,8 +1,8 @@
 import './Map.scss'
 
 import React, { Component } from 'react'
-import ReactDOM from 'react-dom';
-import mapboxgl, { LngLatBounds } from 'mapbox-gl';
+// import ReactDOM from 'react-dom';
+import mapboxgl from 'mapbox-gl';
 
 
 let initialCenter = {lng: -79.09460554196545, lat: 28.475889863700047}
