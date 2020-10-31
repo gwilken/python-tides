@@ -69,7 +69,7 @@ class MidiManager {
   sendNote(pitch, velocity, duration) {
     if (this.midiOutputs) {
       const NOTE_ON = 0x90;
-      const NOTE_OFF = 0x80;
+      // const NOTE_OFF = 0x80;
       
       // const device = midiOut[selectOut.selectedIndex];
       // const device = midiOut[0];

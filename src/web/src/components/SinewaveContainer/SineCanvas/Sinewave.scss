@@ -1,15 +1,16 @@
 .sinewave-container {
-  height: 170px;
+  position: relative;
+  height: 110px;
   width: 700px;
-  border-radius: 9px;
-  margin: 15px 0;
-  padding: 15px;
+  border-radius: 6px;
+  margin: 8px 0;
+  padding: 10px;
   background-color: white;
 
   .title-container {
-    margin: 0 0 15px 0;
+    margin: 0 0 8px 0;
     text-transform: uppercase;
-    font-size: 14px;
+    font-size: 12px;
     user-select: none;
   }
 
@@ -30,13 +31,30 @@
     }
   }
 
+  .output-indicator {
+    position: absolute;
+    right: 15px;
+    top: 30px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+
+    circle {
+      fill: lightgrey;
+
+      &.enabled {
+        fill: #e27575;
+      }
+    }
+  }
+
   .body-container {
     display: flex;
 
     canvas {
-      background-color: #badefd;
-      width: 525px;
-      height: 100px;
+      // background-color: #badefd;
+      width: 450px;
+      height: 90px;
     }
   
     .controls-container {
