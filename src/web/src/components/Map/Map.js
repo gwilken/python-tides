@@ -1,13 +1,12 @@
 import './Map.scss'
 
 import React, { Component } from 'react'
-// import ReactDOM from 'react-dom';
 import mapboxgl from 'mapbox-gl';
-
 
 let initialCenter = {lng: -79.09460554196545, lat: 28.475889863700047}
 // const initialZoom = [5]
 
+// TODO: map on load event
 
 class Map extends Component {
   constructor() {
@@ -26,71 +25,78 @@ class Map extends Component {
       zoom: 6
     });
  
-    fetch('/stations/stations.geojson')
-      .then(res => res.json())
-      .then(data => {
-        this.map.addSource('geojson-markers', {
-          'type': 'geojson',
-          data
-        })
+    this.map.on('mousemove', 'markers', this.handleMarkerHover)
 
-        this.map.addLayer({
-          id: 'markers',
-          source: 'geojson-markers',
-          type: 'circle',
-          filter: ['!', ['has', 'point_count']],
-          paint: {
-            'circle-radius': [
-              'case', ['boolean', ['feature-state', 'hover'], false],
-              7,
-              5
-            ],
-            'circle-stroke-width': [
-              'case', ['boolean', ['feature-state', 'hover'], false],
-              3,
-              1
-            ],
-            'circle-stroke-color': [
-              'case', ['boolean', ['feature-state', 'hover'], false],
-              'rgba(251, 104, 57, 1)',
-              'rgba(50, 98, 234, 1)'
-            ],
-            'circle-color':[
-                'case', ['boolean', ['feature-state', 'hover'], false],
-                'rgba(251, 104, 57, .6)',
-                'rgba(50, 98, 234, .6)'
-              ]
-            }
-          });
+    this.map.on('mouseleave', 'markers', this.handleMarkerHoverLeave)
 
+    this.map.on('load', () => {
+      fetch('/stations/stations.geojson')
+        .then(res => res.json())
+        .then(data => {
+          this.map.addSource('geojson-markers', {
+            'type': 'geojson',
+            data
+          })
+  
           this.map.addLayer({
-            id: "marker-labels",
-            type: "symbol",
-            source: "geojson-markers",
-            layout: { 
-              "text-size": 14, 
-              "text-field": 
-                ["case",
-                  ["to-boolean", ["get","state"]],
-                    ["concat", ["get","name"],", ",["get","state"]],
-                  ["get","name"]
-                ],
-              "text-anchor": "left",
-              "text-offset": [.75, -1] },
+            id: 'markers',
+            source: 'geojson-markers',
+            type: 'circle',
+            filter: ['!', ['has', 'point_count']],
             paint: {
-                "text-color": "rgba(0, 0, 0, 1)",
-                "text-halo-color": "rgb(255,255,255)",
-                "text-halo-width":  [
+              'circle-radius': [
+                'case', ['boolean', ['feature-state', 'hover'], false],
+                7,
+                5
+              ],
+              'circle-stroke-width': [
+                'case', ['boolean', ['feature-state', 'hover'], false],
+                3,
+                1
+              ],
+              'circle-stroke-color': [
+                'case', ['boolean', ['feature-state', 'hover'], false],
+                'rgba(251, 104, 57, 1)',
+                'rgba(50, 98, 234, 1)'
+              ],
+              'circle-color':[
                   'case', ['boolean', ['feature-state', 'hover'], false],
-                  3,
-                  1
+                  'rgba(251, 104, 57, .6)',
+                  'rgba(50, 98, 234, .6)'
                 ]
               }
-          })
-       
-      })
+            });
+  
+            this.map.addLayer({
+              id: "marker-labels",
+              type: "symbol",
+              source: "geojson-markers",
+              layout: { 
+                "text-size": 14, 
+                "text-field": 
+                  ["case",
+                    ["to-boolean", ["get","state"]],
+                      ["concat", ["get","name"],", ",["get","state"]],
+                    ["get","name"]
+                  ],
+                "text-anchor": "left",
+                "text-offset": [.75, -1] },
+              paint: {
+                  "text-color": "rgba(0, 0, 0, 1)",
+                  "text-halo-color": "rgb(255,255,255)",
+                  "text-halo-width":  [
+                    'case', ['boolean', ['feature-state', 'hover'], false],
+                    3,
+                    1
+                  ]
+                }
+            })
+         
+        })
+      
+    })
 
-      this.map.on('click', 'markers', this.handleMarkerClick)
+    this.map.on('click', 'markers', this.handleMarkerClick)
   }
 
 
@@ -103,6 +109,7 @@ class Map extends Component {
       let { properties = { }} = features[0]
       let { harcon_id, id } = properties
    
+      console.log('station properties', properties)
       console.log('harcon_id:', harcon_id, 'id:', id)
 
       // fallback to id, id no harcon_id. dont know if this actually will return anything
@@ -234,40 +241,40 @@ class Map extends Component {
   // }
 
 
-  // handleMarkerHover = (e) => {
-  //   // let features = this.map.queryRenderedFeatures(e.point, {
-  //   //   layers: ['markers'],
-  //   //   filters: ["!", ["has", "point_count"]]
-  //   // })
+  handleMarkerHover = (e) => {
+    // let features = this.map.queryRenderedFeatures(e.point, {
+    //   layers: ['markers'],
+    //   filters: ["!", ["has", "point_count"]]
+    // })
 
-  //   if (e.features && e.features.length > 0) {
-  //     this.map.getCanvas().style.cursor = 'pointer'
+    if (e.features && e.features.length > 0) {
+      this.map.getCanvas().style.cursor = 'pointer'
 
-  //     if ( this.state.hoveredMarkerId) {
-  //       this.map.setFeatureState(
-  //         { source: 'geojson-markers', id: this.state.hoveredMarkerId },
-  //         { hover: false }
-  //       );
-  //     }
+      if ( this.state.hoveredMarkerId) {
+        this.map.setFeatureState(
+          { source: 'geojson-markers', id: this.state.hoveredMarkerId },
+          { hover: false }
+        );
+      }
 
-  //     this.setState({ hoveredMarkerId: e.features[0].id })
+      this.setState({ hoveredMarkerId: e.features[0].id })
 
-  //     this.map.setFeatureState(
-  //       { source: 'geojson-markers', id: this.state.hoveredMarkerId },
-  //       { hover: true }
-  //     );
-  //   } 
-  // }
+      this.map.setFeatureState(
+        { source: 'geojson-markers', id: this.state.hoveredMarkerId },
+        { hover: true }
+      );
+    } 
+  }
 
 
-  // handleMarkerHoverLeave = (e) => {
-  //   this.map.getCanvas().style.cursor = 'grab'
+  handleMarkerHoverLeave = (e) => {
+    this.map.getCanvas().style.cursor = 'grab'
 
-  //   this.map.setFeatureState(
-  //     { source: 'geojson-markers', id: this.state.hoveredMarkerId },
-  //     { hover: false }
-  //     );
-  // }
+    this.map.setFeatureState(
+      { source: 'geojson-markers', id: this.state.hoveredMarkerId },
+      { hover: false }
+      );
+  }
 
 
   // handleMapClick = (e) => {
@@ -367,9 +374,7 @@ class Map extends Component {
 
   render() {
     return (
-      
       <div className="map" ref={el => this.mapContainer = el}></div>
-      
     )
   }
 }

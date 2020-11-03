@@ -40,6 +40,8 @@ def split_stations():
 
 
 def geojson_stations(data):
+  id = 0
+  
   collection = {
     "type": "FeatureCollection",
     "features": []
@@ -57,8 +59,10 @@ def geojson_stations(data):
         "id": item["id"],
         "name": item["name"],
         "state": item["state"]
-      }} 
-    )
+      },
+      "id": id
+    })
+    id += 1
 
   with open('stations.geojson', 'w') as f:
     f.write(json.dumps(collection))
