@@ -8,7 +8,7 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
   const tickRef = useRef(0);
   const canvasRef = useRef();
   
-  const duration = 100;
+  const duration = (1000 / (tempo / 60)) - 100;
 
   let requestId;
   
@@ -19,7 +19,8 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
     let ratio = getPixelRatio(context);
     let computedWidth = getComputedStyle(canvas).getPropertyValue('width').slice(0, -2);
     let computedHeight = getComputedStyle(canvas).getPropertyValue('height').slice(0, -2);
-    let marginRight = 30 * ratio;
+    // let marginRight = 30 * ratio;
+    let marginRight = 0;
 
     canvas.width = computedWidth * ratio;
     canvas.height = computedHeight * ratio;
@@ -27,7 +28,7 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
     canvas.style.height = `${computedHeight}px`;
 
     let now;
-    let then = Date.now();
+    let then = window.performance.now();
     // let startTime = then;
     let elapsed;
     let beatsPerSecondInterval = 1000 / (tempo / 60);
@@ -35,7 +36,7 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
 
     let scalingFactor = 10000
     let readPosition = .99
-    let valueNormalizedLineWidth;
+    // let valueNormalizedLineWidth;
 
     const render = () => {
       if (isEnabled && globalAllowRun) {
@@ -45,7 +46,7 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
         cancelAnimationFrame(requestId)
       }
 
-      now = Date.now();
+      now = window.performance.now();
       elapsed = now - then;
 
       if (elapsed > beatsPerSecondInterval) {
@@ -82,7 +83,7 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
         // get value at read position and save for later
         if (x == Math.floor(readPosition * canvas.width)) {
           valueRef.current = normalize(y, 1, -1).toFixed(4)
-          valueNormalizedLineWidth = normalize(y * (1 - lineWidthRatio), 1.0, -1.0).toFixed(4)
+          // valueNormalizedLineWidth = normalize(y * (1 - lineWidthRatio), 1.0, -1.0).toFixed(4)
         }
       }
       
@@ -102,12 +103,12 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
       // context.stroke();
       
       // draw center horizontal axis
-      context.beginPath();
-      context.strokeStyle = 'orange';
-      context.lineWidth = 2 * ratio; 
-      context.moveTo(canvas.width - marginRight - 20, canvas.height / 2);
-      context.lineTo(canvas.width - marginRight, canvas.height / 2);
-      context.stroke();
+      // context.beginPath();
+      // context.strokeStyle = 'orange';
+      // context.lineWidth = 2 * ratio; 
+      // context.moveTo(canvas.width - marginRight - 20, canvas.height / 2);
+      // context.lineTo(canvas.width - marginRight, canvas.height / 2);
+      // context.stroke();
       
       // clear margin area
       context.rect(canvas.width - marginRight, 0, marginRight, canvas.height);
@@ -117,10 +118,17 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
       // center note
       context.font = "22px Arial";
       context.textBaseline = "middle";
+      context.textAlign = "end";
+      context.lineWidth = 1.5 * ratio; 
+      context.strokeStyle = 'white';
       context.fillStyle = 'black';
+      context.strokeText(
+        mode == 'NOTE_ON' ? note : 63, 
+        canvas.width - 20, 
+        canvas.height / 2);
       context.fillText(
         mode == 'NOTE_ON' ? note : 63, 
-        canvas.width - 50, 
+        canvas.width - 20, 
         canvas.height / 2);
       
       // high range note
@@ -132,7 +140,11 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
         highNote = 64 + Math.floor(parseInt(modeRange) / 2)
       }
       let clampedHighNote = Math.min(Math.max(highNote, 0), 127);
-      context.fillText(clampedHighNote, canvas.width - 50, 25);
+
+      context.lineWidth = 1.5 * ratio; 
+      context.strokeStyle = 'white';
+      context.strokeText(clampedHighNote, canvas.width - 20, 30);
+      context.fillText(clampedHighNote, canvas.width - 20, 30);
       
       // low range note
       context.textBaseline = "top";
@@ -143,7 +155,10 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
         lowNote = 63 - Math.floor(parseInt(modeRange) / 2)  
       }
       let clampedLowNote = Math.min(Math.max(lowNote, 0), 127);
-      context.fillText(clampedLowNote, canvas.width - 50, canvas.height - 25);
+      context.lineWidth = 1.5 * ratio; 
+      context.strokeStyle = 'white';
+      context.strokeText(clampedLowNote, canvas.width - 20, canvas.height - 30);
+      context.fillText(clampedLowNote, canvas.width - 20, canvas.height - 30);
 
       // draw tempo/beat indicator
       context.beginPath();

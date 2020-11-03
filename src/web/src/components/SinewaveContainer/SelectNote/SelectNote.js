@@ -4,7 +4,7 @@ import MIDI_NOTES from '../../../constants/midi-notes'
 const SelectNote = ({note, setNote}) => {
   return (
     <div className="custom-select  select-note">
-      <label htmlFor="select-note">center note</label>
+      <label htmlFor="select-note">center</label>
       <select 
           name="select-note"
           value={ note }
@@ -14,7 +14,7 @@ const SelectNote = ({note, setNote}) => {
             <option 
               value={item['midi']}
               key={item['midi']}>
-                {item['midi']} - {item['piano']} ({item['name']})
+                {item['midi']} (midi) --- {item['piano']} (piano) --- {item['name']} (english)
             </option>))
           }
         </select>

@@ -1,4 +1,4 @@
-import { MODES } from '../../../constants/midi-constants'
+import { MODES } from '../../../constants/midi-modes'
 
 const SelectMode = ({mode, setMode}) => (
   <div className="custom-select ">

@@ -5,6 +5,7 @@ import useMidiOutputs from '../../hooks/useMidiOutputs'
 import SinewaveContainer from '../SinewaveContainer/SinewaveContainer';
 // import Toolbar from '../Toolbar/Toolbar'
 // import { range } from '../../utils/utils';
+// import MIDI_CHANNELS from '../../constants/midi-channels.js'
 
 import './SinePanel.scss'
 
@@ -14,7 +15,7 @@ const SinePanel = () => {
   // const [outputId, setOutputId] = useState()
   // const [globalSpeed, setGlobalSpeed] = useState(.0005)
   const [globalAllowRun, setGlobalAllowRun] = useState(true)
-  const [availableChannels, channels] = useState(new Array(16).fill(1))
+  const [channels, setChannels] = useState(new Array(16).fill(0))
 
   return (
     <div className="sine-panel">
@@ -37,7 +38,8 @@ const SinePanel = () => {
           phase="0"
           freq="13"
           availableOutputs={ availableOutputs }
-          availableChannels={ availableChannels }
+          channels={ channels }
+          setChannels={ setChannels }
           globalAllowRun={ globalAllowRun }
         />
    
@@ -49,7 +51,8 @@ const SinePanel = () => {
           phase="180"
           freq="13"
           availableOutputs={ availableOutputs }
-          availableChannels={ availableChannels }
+          channels={ channels }
+          setChannels={ setChannels }
           globalAllowRun={ globalAllowRun }
         />
 
@@ -61,7 +64,8 @@ const SinePanel = () => {
           phase="180"
           freq="3"
           availableOutputs={ availableOutputs }
-          availableChannels={ availableChannels }
+          channels={ channels }
+          setChannels={ setChannels }
           globalAllowRun={ globalAllowRun }
         />
 
@@ -73,7 +77,8 @@ const SinePanel = () => {
           phase="0"
           freq="5"
           availableOutputs={ availableOutputs }
-          availableChannels={ availableChannels }
+          channels={ channels }
+          setChannels={ setChannels }
           globalAllowRun={ globalAllowRun }
         /> */}
 

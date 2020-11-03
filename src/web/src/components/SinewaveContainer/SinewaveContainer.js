@@ -21,22 +21,24 @@ const SinewaveContainer = (props) => {
   const [amp, setAmp] = useState(props.amp)
   const [phase, setPhase] = useState(props.phase)
   const [freq, setFreq] = useState(props.freq)
-  const [tempo, setTempo] = useState(120)
   const [isEnabled, setEnabled] = useState(prevEnableRef.current);
-
+  
   // mapping settings
   const [mode, setMode] = useState('NOTE_ON')
   const [note, setNote] = useState('69')
   const [ccParameter, setCC] = useState(0x03)
-
   const [modeRange, setModeRange] = useState(Math.floor(127 * parseFloat(amp)))
-
+  
   // output setting
   const [outputDeviceId, setOutputDeviceId] = useState()
   const [outputChannel, setOutputChannel] = useState(0)
+  const [tempo, setTempo] = useState(120)
 
   // global
-  const {globalAllowRun, availableOutputs, availableChannels} = props
+  const {globalAllowRun, availableOutputs, channels, setChannels} = props
+
+  // ui settings
+  const [collapsed, setCollapsed] = useState(false);
 
 
   // check if selected output was removed
@@ -66,12 +68,13 @@ const SinewaveContainer = (props) => {
 
   const sendNote = (note, time) => {
     const midi = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
-    // msg = [command, pitch, velocity]. use bitwise OR to add channel
+    // msg = [command, pitch, velocity]. using bitwise OR to add channel
     const msgOn = [0x90 | outputChannel, note, 127]
-    const msgOff = [0x80 | outputChannel, note, 127]
-
+    const msgOff = [0x80 | outputChannel, note, 64]
+    // derive note duration from current tempo. in millisecs.
+    const duration = Math.floor(1000 / (tempo / 60))
     midi.send(msgOn)
-    midi.send(msgOff, time + 250)
+    midi.send(msgOff, window.performance.now() + duration)
   }
 
 
@@ -95,21 +98,21 @@ const SinewaveContainer = (props) => {
 
   if (mode == 'NOTE_ON') {
     SecondarySelect =
-    <SelectNote 
-      mode={mode}
-      note={note}
-      setNote={setNote}
-    />;
+      <SelectNote 
+        mode={mode}
+        note={note}
+        setNote={setNote}
+      />;
   } else if (mode == 'CC') {
     SecondarySelect = 
-    <SelectCC 
-      ccParameter={ccParameter}
-      setCC={setCC}
-    />;
+      <SelectCC 
+        ccParameter={ccParameter}
+        setCC={setCC}
+      />;
   }
 
   return (
-    <div className="sinewave-container">
+    <div className={`sinewave-container ${collapsed ? 'collapsed' : ''}`}>
       <div className="body-container">
         <SineCanvas 
           speed={speed}
@@ -150,7 +153,8 @@ const SinewaveContainer = (props) => {
             />
 
             <SelectChannel 
-              availableChannels={availableChannels}
+              channels={channels}
+              setChannels={setChannels}
               outputChannel={outputChannel}
               setOutputChannel={setOutputChannel}
             />
@@ -160,7 +164,9 @@ const SinewaveContainer = (props) => {
               setTempo={setTempo}
             />
           </div>
+        </div>
 
+        <div className="side-controls-container">
           <div className="button-enable">
             <svg 
               onClick={ handleEnableClick }>
@@ -170,10 +176,24 @@ const SinewaveContainer = (props) => {
                 cy="15"
                 r="15"
               />
+
+              { collapsed &&
+                <text x="50%" y="50%" textAnchor="middle" fill="white" dy=".3em">
+                  { parseInt(outputChannel) + 1 }
+                </text>
+              }
             </svg>
-            <div
-              onClick={() => handleResetNotes()}>
-              reset</div>
+          </div>
+
+          <div className="button-collapse"
+            onClick={ () => setCollapsed(!collapsed) }>
+            <svg viewBox="0 0 30 50">
+              <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                <g fill="#000000">
+                  <path d="M5.22428571,25.0010732 L29.3556494,3.57190657 C30.1980519,2.75498737 30.1980519,1.42960859 29.3556494,0.612689394 C28.5132468,-0.204229798 27.1457143,-0.204229798 26.3033117,0.612689394 L0.624350649,23.4151515 C0.174220779,23.8506944 -0.0165584416,24.4300505 0.0134415584,24.9989268 C-0.0165584416,25.5699495 0.174220779,26.1471591 0.624350649,26.5827652 L26.3033117,49.3851641 C27.1457143,50.2020833 28.5132468,50.2020833 29.3556494,49.3851641 C30.1980519,48.5683081 30.1980519,47.2428662 29.3556494,46.4260101 L5.22428571,25.0010732 Z" id="Path"></path>
+                </g>
+              </g>
+            </svg>
           </div>
 
         </div>

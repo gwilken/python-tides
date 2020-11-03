@@ -1,30 +1,43 @@
+// import { useEffect, useRef } from 'react';
 
-const SelectChannel = ({availableChannels, outputChannel, setOutputChannel}) => {
-// if (availableOutputs.length > 0 && !outputId) {
-//   defaultId = availableOutputs[0].id
-// }
+const SelectChannel = ({channels, setChannels, outputChannel, setOutputChannel}) => {
+// check if channels is selected elsewhere and disable
+// let prevSelection = useRef();
 
-// TODO only show non selected channels
+function createOptions() {
+  return channels.map((inUseStatus, index) => (
+    <option
+      disabled={ (inUseStatus) }
+      value={index}
+      key={index}>
+        {index + 1}
+    </option>))
+}
+
+// useEffect(() => {
+//   console.log('channels select rerender')
+//   createOptions()
+// }, [channels])
+
+
+function handleSelect(index) {
+  // let newChannels = channels;
+  // newChannels[index] = true;
+  // newChannels[prevSelection.current] = false
+  // prevSelection.current = index
+  // setChannels([...newChannels]);
+  setOutputChannel(index);
+}
 
 return (
   <div className="custom-select ">
     <label htmlFor="channel-output">channel</label>
     <select 
         name="channel-output"
-        value={ outputChannel ? outputChannel : "no-channel" }
-        onChange={ (e) => setOutputChannel(e.target.value) }>
-
-        { availableChannels.length > 0
-          ? availableChannels.map((channel, index) => (
-            <option 
-            value={index}
-            key={index}>
-                { index }
-            </option>))
-          : <option
-          value="no-channel">
-                No Channels Available
-            </option>
+        value={ outputChannel }
+        onChange={ (e) => handleSelect(e.target.value) }>
+        {
+          createOptions()
         }
       </select>
     </div>
