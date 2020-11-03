@@ -1,18 +1,68 @@
+$color-blue: #badefd;
+$color-dark-blue: #0e85ea;
+$color-light-grey: #ececec;
+
 body {
+  position: relative;
   background-color: rgb(216, 216, 216);
 
   * {
     box-sizing: border-box;
   }
-}
 
-.sines-container {
-  position: relative;
-}
+  label {
+    color: dimgrey;
+    font-size: 11px;
+  }
 
-.fullscreen-container {
-  position: relative;
-  display: flex;
-  width: 100%;
-  height: 100%;
+  .custom-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    select {
+      max-width: 110px;
+      -webkit-appearance: button;
+      -moz-appearance: button;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -webkit-padding-end: 20px;
+      -moz-padding-end: 20px;
+      -webkit-padding-start: 2px;
+      -moz-padding-start: 2px;
+      background-color: $color-light-grey; /* Fallback color if gradients are not supported */
+      background-position: center right;
+      background-repeat: no-repeat;
+      border: none;
+      border-radius: 0px;
+      color: #555;
+      font-size: 11px;
+      margin: 0 10px;
+      overflow: hidden;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .custom-range {
+    display: flex;
+    align-items: center;
+
+    input {
+      margin-left: 10px;
+    }
+  }
+
+  .sines-container {
+    position: relative;
+  }
+  
+  .fullscreen-container {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
 }

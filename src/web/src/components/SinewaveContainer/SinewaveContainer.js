@@ -1,26 +1,19 @@
 
-// import React from 'react';
-// import { useEffect, useState, useRef } from 'react';
 import { useState, useEffect, useRef } from 'react';
 
 import SineCanvas from './SineCanvas/SineCanvas';
 import SelectMode from './SelectMode/SelectMode';
+import SelectNote from './SelectNote/SelectNote'
+import SelectCC from './SelectCC/SelectCC'
+import SelectModeRange from './SelectModeRange/SelectModeRange'
 import SelectDeviceId from './SelectDeviceId/SelectDeviceId';
 import SelectChannel from './SelectChannel/SelectChannel';
-
-import {  
-  NOTE_OFF,
-  NOTE_ON,
-  CC } from '../../constants/midi-constants'
+import SelectTempoRange from './SelectTempoRange/SelectTempoRange'
 
 import './SinewaveContainer.scss';
-// import { normalize } from './../../utils/utils';
 
 
 const SinewaveContainer = (props) => {
-  // const valueRef = useRef();
-  // const tickRef = useRef(0);
-  // const canvasRef = useRef();
   const prevEnableRef = useRef(true);
 
   // osc settings
@@ -32,8 +25,11 @@ const SinewaveContainer = (props) => {
   const [isEnabled, setEnabled] = useState(prevEnableRef.current);
 
   // mapping settings
-  const [mode, setMode] = useState(0x90)
-  const [outputRange, setOutputRange] = useState([0, 127])
+  const [mode, setMode] = useState('NOTE_ON')
+  const [note, setNote] = useState('69')
+  const [ccParameter, setCC] = useState(0x03)
+
+  const [modeRange, setModeRange] = useState(Math.floor(127 * parseFloat(amp)))
 
   // output setting
   const [outputDeviceId, setOutputDeviceId] = useState()
@@ -42,91 +38,78 @@ const SinewaveContainer = (props) => {
   // global
   const {globalAllowRun, availableOutputs, availableChannels} = props
 
-  // console.log('availableChannels', availableChannels)
-
-  // const [message, setMessage] = useState()
-
 
   // check if selected output was removed
   useEffect(() => {
     let ids = availableOutputs.map(output => output.id)
     if(ids.indexOf(outputDeviceId) === -1) {
-      console.log('removed.')
       setOutputDeviceId(null)
     }
-    
   }, [availableOutputs])
 
 
   const handleData = (data) => {
-    const [rawValue, midiValue, time] = data
-    // console.log('time:', time)
-    // console.log('availableOutputs, outputDeviceId',availableOutputs, outputDeviceId)
-    // console.log('mode, outputChannel, command', parseInt(mode), parseInt(outputChannel), parseInt(mode) | parseInt(outputChannel))
-
+    const [rawValue, time] = data
     if (outputDeviceId && availableOutputs.length > 0) {
-      const midi = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
-
-      // console.log('midi value', midiValue)
-        // const ccAndChannel = MIDIConstants.cc | getChannel(channel);
-      
-
-      midi.send([CC | outputChannel, 0x03, midiValue ])
-
-      // command, pitch, velocity
-      // const msgOn = [NOTE_ON, 60, 127]
-      // const msgOff = [NOTE_OFF, 60, 127]
-      // midi.send(msgOn)
-
-      // midi.send(msgOff, Date.now() + 100)
-      // midi.send(msgOff, time + 100)
+      if (mode == 'NOTE_ON') {
+        let midiValue = Math.floor(parseFloat(rawValue) * parseInt(modeRange)) + (parseInt(note) - (Math.floor(parseInt(modeRange) / 2)))
+        let clampedMidiValue = Math.min(Math.max(midiValue, 0), 127);
+        sendNote(clampedMidiValue, time)
+      } else if (mode == 'CC') {
+        let midiValue = Math.floor(parseFloat(rawValue) * parseInt(modeRange)) + (63 - (Math.floor(parseInt(modeRange) / 2)))
+        let clampedMidiValue = Math.min(Math.max(midiValue, 0), 127);
+        sendCC(clampedMidiValue)
+      }
     }
-
-    // const msg = [mode, ]
-    // const device = midiOut[selectOut.selectedIndex];
-    // const msgOn = [NOTE_ON, pitch, velocity];
-    // const msgOff = [NOTE_ON, pitch, velocity];
-    
-    // device.send(msgOn); 
- 
-    // device.send(msgOff, Date.now() + duration); 
-
   }
 
+
+  const sendNote = (note, time) => {
+    const midi = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
+    // msg = [command, pitch, velocity]. use bitwise OR to add channel
+    const msgOn = [0x90 | outputChannel, note, 127]
+    const msgOff = [0x80 | outputChannel, note, 127]
+
+    midi.send(msgOn)
+    midi.send(msgOff, time + 250)
+  }
+
+
+  const sendCC = (value) => {
+    const midi = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
+    midi.send([0xB0 | outputChannel, ccParameter, value ])
+  }
 
   const handleEnableClick = () => {
     prevEnableRef.current = !prevEnableRef.current
     setEnabled(prevEnableRef.current)
   }
 
+  const handleResetNotes = () => {
+    const midi = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
+    midi.send([0xB0 | outputChannel, 123, 127 ])
+  }
 
-  // const handleEnableSineMidi = () => {
-  //   prevEnableSineMidi.current = !prevEnableSineMidi.current
-  //   setSineMidiOutput(prevEnableSineMidi.current)    
-  // }
 
-  // const handleEnableSquareMidi = () => {
-  //   prevEnableSquareMidi.current = !prevEnableSquareMidi.current
-  //   setSquareMidiOutput(prevEnableSquareMidi.current)    
-  // }
+  let SecondarySelect;
 
-  let x = ['one', 'two']
-
+  if (mode == 'NOTE_ON') {
+    SecondarySelect =
+    <SelectNote 
+      mode={mode}
+      note={note}
+      setNote={setNote}
+    />;
+  } else if (mode == 'CC') {
+    SecondarySelect = 
+    <SelectCC 
+      ccParameter={ccParameter}
+      setCC={setCC}
+    />;
+  }
 
   return (
     <div className="sinewave-container">
-
-      <svg 
-        className="output-indicator"
-        onClick={ handleEnableClick }>
-        <circle 
-          className= { isEnabled ? 'enabled' : ''}
-          cx="20"
-          cy="20"
-          r="20"
-        />
-      </svg>
-
       <div className="body-container">
         <SineCanvas 
           speed={speed}
@@ -136,62 +119,66 @@ const SinewaveContainer = (props) => {
           tempo={tempo}
           isEnabled={isEnabled}
           globalAllowRun={globalAllowRun}
+          mode={mode}
+          modeRange={modeRange}
+          note={note}
           handleData={ handleData }
         />
 
-        <SelectMode 
-          mode={mode}
-          setMode={setMode}
-        />
+        <div className="controls-container">
+          <div className="mode-container">
+            <SelectMode 
+              mode={mode}
+              setMode={setMode}
+            />
 
-        <input type="range"
-          min="1"
-          max="720"
-          value={tempo}
-          step="1"
-          onChange={(e) => setTempo(e.target.value)}
-        />
+            { SecondarySelect }
 
-        <div className="output-panel">
-          <SelectDeviceId 
-            availableOutputs={availableOutputs}
-            outputDeviceId={outputDeviceId}
-            setOutputDeviceId={setOutputDeviceId}
-          />
+            <SelectModeRange 
+              mode={mode}
+              modeRange={modeRange}
+              setModeRange={setModeRange}
+            />
+          </div>
+          
 
-          <SelectChannel 
-            availableChannels={availableChannels}
-            outputChannel={outputChannel}
-            setOutputChannel={setOutputChannel}
-          />
+          <div className="output-container">
+            <SelectDeviceId 
+              availableOutputs={availableOutputs}
+              outputDeviceId={outputDeviceId}
+              setOutputDeviceId={setOutputDeviceId}
+            />
+
+            <SelectChannel 
+              availableChannels={availableChannels}
+              outputChannel={outputChannel}
+              setOutputChannel={setOutputChannel}
+            />
+
+            <SelectTempoRange 
+              tempo={tempo}
+              setTempo={setTempo}
+            />
+          </div>
+
+          <div className="button-enable">
+            <svg 
+              onClick={ handleEnableClick }>
+              <circle 
+                className= { isEnabled ? 'enabled' : ''}
+                cx="15"
+                cy="15"
+                r="15"
+              />
+            </svg>
+            <div
+              onClick={() => handleResetNotes()}>
+              reset</div>
+          </div>
+
         </div>
 
-        {/* <Selection
-          name="ouput-device"
-          value="0" 
-          options={ props.availableOutputs }
-          handleChange={ (e) => console.log(e) }
-        /> */}
-
-        {/* <MemoizedSineCanvas 
-          speed={speed}
-          amp={amp}
-          phase={phase} 
-          freq={freq}
-          isEnabled={isEnabled}
-          globalAllowRun={globalAllowRun}
-          handleData={handleData}
-        /> */}
-
-        {/* <OutputPanel
-          valueMode={valueMode} 
-          setValueMode={setValueMode}
-          outputRange={outputRange} 
-          setOutputRange={setOutputRange}
-        /> */}
-
       </div>
-
     </div>
   );
 }

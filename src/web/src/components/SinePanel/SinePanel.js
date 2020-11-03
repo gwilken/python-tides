@@ -14,7 +14,7 @@ const SinePanel = () => {
   // const [outputId, setOutputId] = useState()
   // const [globalSpeed, setGlobalSpeed] = useState(.0005)
   const [globalAllowRun, setGlobalAllowRun] = useState(true)
-  const [availableChannels, channels] = useState(new Array(128).fill(1))
+  const [availableChannels, channels] = useState(new Array(16).fill(1))
 
   return (
     <div className="sine-panel">
@@ -40,12 +40,24 @@ const SinePanel = () => {
           availableChannels={ availableChannels }
           globalAllowRun={ globalAllowRun }
         />
+   
+        <SinewaveContainer
+          number="1" 
+          name="M2"
+          description="Principal lunar semidiurnal constituent"
+          amp=".75"
+          phase="180"
+          freq="13"
+          availableOutputs={ availableOutputs }
+          availableChannels={ availableChannels }
+          globalAllowRun={ globalAllowRun }
+        />
 
         <SinewaveContainer
           number="1" 
           name="M2"
           description="Principal lunar semidiurnal constituent"
-          amp="1"
+          amp=".25"
           phase="180"
           freq="3"
           availableOutputs={ availableOutputs }

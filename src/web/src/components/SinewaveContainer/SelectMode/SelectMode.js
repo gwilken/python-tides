@@ -1,43 +1,23 @@
-import {  
-  NOTE_OFF,
-  NOTE_ON,
-  AFTERTOUCH,
-  CC,
-  PATCH_CHANGE,
-  CHANNEL_PRESSURE,
-  PITCH_BEND } from '../../../constants/midi-constants'
-
-const modes =[{
-    name: 'Note On',
-    value: NOTE_ON
-  },
-  {
-    name: 'Control Channel',
-    value: CC
-  }
-]
-
+import { MODES } from '../../../constants/midi-constants'
 
 const SelectMode = ({mode, setMode}) => (
-  <div>
+  <div className="custom-select ">
+    <label htmlFor="mode-select">mode</label>
     <select
       name="mode-select"
       value={ mode }
       onChange={ (e) => setMode(e.target.value) }>
-      
       {
-        modes.map(({value, name}) => (
+        MODES.map(({id, displayName}) => (
           <option 
-            value={ value }
-            key={ value }>
-              { name }
+            value={ id }
+            key={ id }>
+              { displayName }
           </option>)
         )
       }
-
     </select>
   </div>
 )
-
 
 export default SelectMode
