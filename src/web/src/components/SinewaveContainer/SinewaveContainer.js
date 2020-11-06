@@ -16,29 +16,24 @@ import './SinewaveContainer.scss';
 const SinewaveContainer = (props) => {
   const prevEnableRef = useRef(true);
 
-  // osc settings
-  const [speed, setSpeed] = useState(.0005) 
-  const [amp, setAmp] = useState(props.amp)
-  const [phase, setPhase] = useState(props.phase)
-  const [freq, setFreq] = useState(props.freq)
+  // global
+  const {globalRun, globalSpeed, availableOutputs, channels, setChannels } = props
+
   const [isEnabled, setEnabled] = useState(prevEnableRef.current);
   
   // mapping settings
   const [mode, setMode] = useState('NOTE_ON')
   const [note, setNote] = useState('69')
   const [ccParameter, setCC] = useState(0x03)
-  const [modeRange, setModeRange] = useState(Math.floor(127 * parseFloat(amp)))
+  const [modeRange, setModeRange] = useState(Math.floor(127 * parseFloat(props.amp)))
   
   // output setting
   const [outputDeviceId, setOutputDeviceId] = useState()
-  const [outputChannel, setOutputChannel] = useState(0)
+  const [outputChannel, setOutputChannel] = useState(props.number - 1)
   const [tempo, setTempo] = useState(120)
 
-  // global
-  const {globalAllowRun, availableOutputs, channels, setChannels} = props
-
   // ui settings
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
 
   // check if selected output was removed
@@ -115,13 +110,13 @@ const SinewaveContainer = (props) => {
     <div className={`sinewave-container ${collapsed ? 'collapsed' : ''}`}>
       <div className="body-container">
         <SineCanvas 
-          speed={speed}
-          amp={amp}
-          phase={phase} 
-          freq={freq}
+          globalSpeed={globalSpeed}
+          amp={props.amp}
+          phase={props.phase} 
+          freq={props.freq}
           tempo={tempo}
           isEnabled={isEnabled}
-          globalAllowRun={globalAllowRun}
+          globalRun={globalRun}
           mode={mode}
           modeRange={modeRange}
           note={note}
@@ -171,7 +166,7 @@ const SinewaveContainer = (props) => {
             <svg 
               onClick={ handleEnableClick }>
               <circle 
-                className= { isEnabled ? 'enabled' : ''}
+                className= { isEnabled && globalRun ? 'enabled' : ''}
                 cx="15"
                 cy="15"
                 r="15"

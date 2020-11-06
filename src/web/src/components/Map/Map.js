@@ -6,8 +6,6 @@ import mapboxgl from 'mapbox-gl';
 let initialCenter = {lng: -79.09460554196545, lat: 28.475889863700047}
 // const initialZoom = [5]
 
-// TODO: map on load event
-
 class Map extends Component {
   constructor() {
     super()
@@ -29,74 +27,68 @@ class Map extends Component {
 
     this.map.on('mouseleave', 'markers', this.handleMarkerHoverLeave)
 
+    this.map.on('click', 'markers', this.handleMarkerClick)
+
     this.map.on('load', () => {
-      fetch('/stations/stations.geojson')
-        .then(res => res.json())
-        .then(data => {
-          this.map.addSource('geojson-markers', {
-            'type': 'geojson',
-            data
-          })
+      this.map.addSource('geojson-markers', {
+        'type': 'geojson',
+        data: this.props.stations
+      })
   
-          this.map.addLayer({
-            id: 'markers',
-            source: 'geojson-markers',
-            type: 'circle',
-            filter: ['!', ['has', 'point_count']],
-            paint: {
-              'circle-radius': [
-                'case', ['boolean', ['feature-state', 'hover'], false],
-                7,
-                5
+      this.map.addLayer({
+        id: 'markers',
+        source: 'geojson-markers',
+        type: 'circle',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-radius': [
+            'case', ['boolean', ['feature-state', 'hover'], false],
+            7,
+            5
+          ],
+          'circle-stroke-width': [
+            'case', ['boolean', ['feature-state', 'hover'], false],
+            3,
+            1
+          ],
+          'circle-stroke-color': [
+            'case', ['boolean', ['feature-state', 'hover'], false],
+            'rgba(251, 104, 57, 1)',
+            'rgba(50, 98, 234, 1)'
+          ],
+          'circle-color':[
+              'case', ['boolean', ['feature-state', 'hover'], false],
+              'rgba(251, 104, 57, .6)',
+              'rgba(50, 98, 234, .6)'
+            ]
+          }
+        });
+
+        this.map.addLayer({
+          id: "marker-labels",
+          type: "symbol",
+          source: "geojson-markers",
+          layout: { 
+            "text-size": 14, 
+            "text-field": 
+              ["case",
+                ["to-boolean", ["get","state"]],
+                  ["concat", ["get","name"],", ",["get","state"]],
+                ["get","name"]
               ],
-              'circle-stroke-width': [
+            "text-anchor": "left",
+            "text-offset": [.75, -1] },
+          paint: {
+              "text-color": "rgba(0, 0, 0, 1)",
+              "text-halo-color": "rgb(255,255,255)",
+              "text-halo-width":  [
                 'case', ['boolean', ['feature-state', 'hover'], false],
                 3,
                 1
-              ],
-              'circle-stroke-color': [
-                'case', ['boolean', ['feature-state', 'hover'], false],
-                'rgba(251, 104, 57, 1)',
-                'rgba(50, 98, 234, 1)'
-              ],
-              'circle-color':[
-                  'case', ['boolean', ['feature-state', 'hover'], false],
-                  'rgba(251, 104, 57, .6)',
-                  'rgba(50, 98, 234, .6)'
-                ]
-              }
-            });
-  
-            this.map.addLayer({
-              id: "marker-labels",
-              type: "symbol",
-              source: "geojson-markers",
-              layout: { 
-                "text-size": 14, 
-                "text-field": 
-                  ["case",
-                    ["to-boolean", ["get","state"]],
-                      ["concat", ["get","name"],", ",["get","state"]],
-                    ["get","name"]
-                  ],
-                "text-anchor": "left",
-                "text-offset": [.75, -1] },
-              paint: {
-                  "text-color": "rgba(0, 0, 0, 1)",
-                  "text-halo-color": "rgb(255,255,255)",
-                  "text-halo-width":  [
-                    'case', ['boolean', ['feature-state', 'hover'], false],
-                    3,
-                    1
-                  ]
-                }
-            })
-         
+              ]
+            }
         })
-      
     })
-
-    this.map.on('click', 'markers', this.handleMarkerClick)
   }
 
 
@@ -107,13 +99,10 @@ class Map extends Component {
 
     if (features && features.length > 0) {
       let { properties = { }} = features[0]
-      let { harcon_id, id } = properties
-   
-      console.log('station properties', properties)
-      console.log('harcon_id:', harcon_id, 'id:', id)
+  
 
       // fallback to id, id no harcon_id. dont know if this actually will return anything
-      this.updateHarmonics(harcon_id ? harcon_id : id)
+      this.updateHarmonics(properties)
 
       // TODO: open sines window, display sines
 
@@ -135,11 +124,23 @@ class Map extends Component {
   }
 
 
-  updateHarmonics = (id) => {
-    fetch(`/harmonics/${id}.json`)
-      .then(res => res.json())
-      .then(data => {
+  updateHarmonics = (station) => {
+    console.log('station', station)
+    
+    let { harcon_id, id } = station
+    
+    console.log('harcon_id:', harcon_id, 'id:', id)
+    
+    let url = harcon_id ? `/harmonics/${harcon_id}.json` : `/harmonics/${id}.json`
+    
+    fetch(url)
+    .then(res => res.json())
+    .then(data => {
+        this.props.setSelectedStation(station)
+        this.props.setHarmonics(data)
+
         console.log(data)
+
       })
       .catch(e => {
         console.log('error fetching harmonics:', e)

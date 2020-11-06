@@ -1,24 +1,37 @@
 import './App.scss';
 
-// import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-import Map from './Map/Map'
-import SinePanel from './SinePanel/SinePanel'
-
-// import midi from '../utils/midi-manager'
-
-
-// midi.initialize()
+import Map from './Map/Map';
+import SinePanel from './SinePanel/SinePanel';
 
 
 function App() {
+  const [stations, setStations] = useState([]);
+  const [selectedStation, setSelectedStation] = useState();
+  const [harmonics, setHarmonics] = useState([]);
+
+  useEffect(() => {
+    fetch('/stations/stations.geojson')
+      .then(res => res.json())
+      .then(data => {
+        setStations(data);
+      })
+  }, [])
 
   return (
     <div className="fullscreen-container">
 
-      <SinePanel />  
+      <SinePanel 
+        harmonics={harmonics}
+        selectedStation={selectedStation}
+      />  
       
-      <Map />
+      <Map 
+        stations={stations} 
+        setHarmonics={setHarmonics}
+        setSelectedStation={setSelectedStation}
+      />
     
     </div>
   );

@@ -1,48 +1,45 @@
-import React from 'react'
 
 import './Toolbar.scss'
 
+// TODO:
+// label, global stop/start, global collapse, global speed, midi reset, resync
 
-const Toolbar = ({outputId, setOutputId, availableOutputs, globalSpeed, setGlobalSpeed, setGlobalAllowRun, globalAllowRun }) => {
-  let defaultId = "no-device"
 
-  if (availableOutputs.length > 0 && !outputId) {
-    defaultId = availableOutputs[0].id
-  }
+const Toolbar = ({ 
+  globalSpeed, 
+  setGlobalSpeed, 
+  setGlobalRun, 
+  globalRun,
+  globalCollapse, 
+  setGlobalCollapse, 
+  instanceKey, 
+  setInstanceKey }) => {
 
+  
   return (
     <div className="toolbar">
-      <select 
-        name="midi-output"
-        value={ outputId ? outputId : defaultId }
-        onChange={ (e) => setOutputId(e.target.value) }>
+  
+      <div onClick={ () => setInstanceKey(instanceKey + 1)}>reset</div>
 
-        { availableOutputs.length > 0
-          ? availableOutputs.map(output => (
-            <option 
-              value={ output.id }
-              key={output.id}>
-                { output.name }
-            </option>))
-          : <option
-              value="no-device">
-                No Midi Device Available
-            </option>
-        }
-      </select>
+      <div className="global-range custom-range">
+        <label htmlFor="global-speed">global speed</label>
+        <input 
+          name="global-speed"
+          type="range"
+          min=".1"
+          max="1"
+          step=".01"
+          value={ globalSpeed }
+          onChange={ (e) => setGlobalSpeed(e.target.value) } />
+      </div>
 
-      <input 
-        type="range"
-        min=".0001"
-        max=".001"
-        step=".00001"
-        value={ globalSpeed }
-        onChange={ (e) => setGlobalSpeed(e.target.value) } />
+    
+      
+      <div onClick={ () => setGlobalRun(!globalRun)}>
+        { globalRun ? 'all stop' : 'run' }
+      </div>
+    
 
-      <div
-        onClick={ () => setGlobalAllowRun(!globalAllowRun)}>
-        
-        GLOBAL RUN</div>
     </div>
   )
 }

@@ -7,7 +7,6 @@ const SelectModeRange = ({mode, modeRange, setModeRange}) => {
           name="range-mode"
           type="range"
           min="1"
-          // max="255"
           max="127"
           value={modeRange}
           step="1"

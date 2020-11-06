@@ -1,17 +1,28 @@
 import { useEffect, useRef } from 'react';
 import { getPixelRatio, normalize } from '../../../utils/utils';
-import './Sinewave.scss';
 
 
-const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, mode, modeRange, note, handleData }) => {  
-  const valueRef = useRef();
-  const tickRef = useRef(0);
-  const canvasRef = useRef();
+const SineCanvas = ({
+  amp, 
+  phase, 
+  freq, 
+  tempo, 
+  isEnabled, 
+  globalRun, 
+  globalSpeed,
+  mode, 
+  modeRange, 
+  note, 
+  handleData }) => {  
   
-  const duration = (1000 / (tempo / 60)) - 100;
+
+  const valueRef = useRef();
+  const canvasRef = useRef();
+  const prevTimestampRef = useRef(0);
 
   let requestId;
   
+
   useEffect(() => {
     let canvas = canvasRef.current;
     let context = canvas.getContext('2d');
@@ -27,26 +38,30 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
     canvas.style.width = `${computedWidth}px`;
     canvas.style.height = `${computedHeight}px`;
 
-    let now;
-    let then = window.performance.now();
-    // let startTime = then;
+    let then = 0;
     let elapsed;
     let beatsPerSecondInterval = 1000 / (tempo / 60);
-    let beatAnimationState;
+    let beatAnimationState = false;
+    let animationDuration = (1000 / (tempo / 60)) - 100;
 
     let scalingFactor = 10000
     let readPosition = .99
-    // let valueNormalizedLineWidth;
 
-    const render = () => {
-      if (isEnabled && globalAllowRun) {
+    const render = (now) => {
+      if (now == undefined) {
+        now = prevTimestampRef.current
+        then = now
+      }
+
+      prevTimestampRef.current = now
+
+      if (isEnabled && globalRun) {
         // eslint-disable-next-line
         requestId = requestAnimationFrame(render)
       } else {
         cancelAnimationFrame(requestId)
       }
-
-      now = window.performance.now();
+    
       elapsed = now - then;
 
       if (elapsed > beatsPerSecondInterval) {
@@ -57,7 +72,7 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
 
         setTimeout(() => {
           beatAnimationState = false
-        }, duration)
+        }, animationDuration)
       }
 
       context.rect(0, 0, canvas.width - marginRight, canvas.height);
@@ -75,7 +90,7 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
 
       // draw sine wave
       for (let x = 0; x < canvas.width; x++) {
-        let y = amp * (Math.sin(2 * Math.PI * freq * ((x / scalingFactor) + tickRef.current) + (phase * 10)));
+        let y = amp * (Math.sin(2 * Math.PI * freq * ((x / scalingFactor) + (now / (scalingFactor / globalSpeed))) + parseFloat(phase) ));
         // normalized and offset for lineWidth
         let draw_y = normalize(y * (1 - lineWidthRatio), 1.0, -1.0).toFixed(4)
         // flip the wave because canvas 0,0 starts at upper left, not lower right
@@ -111,9 +126,36 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
       // context.stroke();
       
       // clear margin area
-      context.rect(canvas.width - marginRight, 0, marginRight, canvas.height);
-      context.fillStyle = 'white';
-      context.fill();
+      // context.rect(canvas.width - marginRight, 0, marginRight, canvas.height);
+      // context.fillStyle = 'white';
+      // context.fill();
+
+
+      // tick debug
+      // context.font = "36px Arial";
+      // context.textBaseline = "middle";
+      // context.textAlign = "center";
+      // context.lineWidth = 1.5 * ratio; 
+      // context.strokeStyle = 'white';
+      // context.fillStyle = 'black';
+      // context.strokeText(
+      //   localTickRef.current, 
+      //   canvas.width / 2, 
+      //   canvas.height / 2);
+      // context.fillText(
+      //   localTickRef.current, 
+      //   canvas.width / 2, 
+      //   canvas.height / 2);
+  
+      // context.strokeText(
+      //   now, 
+      //   canvas.width / 2, 
+      //   canvas.height / 4);
+      // context.fillText(
+      //   now, 
+      //   canvas.width / 2, 
+      //   canvas.height / 4);
+
 
       // center note
       context.font = "22px Arial";
@@ -123,11 +165,11 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
       context.strokeStyle = 'white';
       context.fillStyle = 'black';
       context.strokeText(
-        mode == 'NOTE_ON' ? note : 63, 
+        mode == 'NOTE_ON' ? note : 64, 
         canvas.width - 20, 
         canvas.height / 2);
       context.fillText(
-        mode == 'NOTE_ON' ? note : 63, 
+        mode == 'NOTE_ON' ? note : 64, 
         canvas.width - 20, 
         canvas.height / 2);
       
@@ -168,16 +210,12 @@ const SineCanvas = ({speed, amp, phase, freq, tempo, isEnabled, globalAllowRun, 
       context.arc(25, canvas.height - 25, 12, 0, 2 * Math.PI);
       context.stroke()
 
-      if (beatAnimationState) {
+      if (beatAnimationState && isEnabled && globalRun) {
         context.fill();
       }
-
-      // if (isEnabled && globalAllowRun) {
-        tickRef.current += parseFloat(speed);
-      // }
     }
 
-    render()
+    render();
 
     return () => {
       cancelAnimationFrame(requestId)

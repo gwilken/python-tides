@@ -56,9 +56,19 @@ body {
     }
   }
 
-  .sines-container {
-    position: relative;
+  .sine-panel {
+    position: absolute;
+    margin-left: 8px;
+    // width: 66%; 
+    pointer-events: none;
+    
+    .sines-container {
+      position: relative;
+      pointer-events: none;
+    }
   }
+
+  
   
   .fullscreen-container {
     position: relative;

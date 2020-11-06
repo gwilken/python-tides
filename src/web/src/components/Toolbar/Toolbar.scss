@@ -1,0 +1,14 @@
+.toolbar {
+  display: flex;
+  pointer-events: all;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background-color: white;
+  border-radius: 5px;
+  margin-top: 5px;
+
+  .button-global-run {
+    cursor: pointer;
+  }
+}
+
