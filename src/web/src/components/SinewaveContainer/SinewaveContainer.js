@@ -25,7 +25,7 @@ const SinewaveContainer = (props) => {
   const [mode, setMode] = useState('NOTE_ON')
   const [note, setNote] = useState('69')
   const [ccParameter, setCC] = useState(0x03)
-  const [modeRange, setModeRange] = useState(Math.floor(127 * parseFloat(props.amp)))
+  const [modeRange, setModeRange] = useState(127)
   
   // output setting
   const [outputDeviceId, setOutputDeviceId] = useState()

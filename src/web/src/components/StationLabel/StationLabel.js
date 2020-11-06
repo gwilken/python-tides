@@ -1,8 +1,14 @@
+import './StationLabel.scss';
 
-const StationLabel = ({}) => {
+const StationLabel = ({selectedStation}) => {
+  let label;
   
+  if (selectedStation) {
+    label = (<h1>{selectedStation.name ? selectedStation.name : ''}{selectedStation.state ? ', ' + selectedStation.state : ''}</h1>)
+  }
+
   return (
-    <div>STATION</div>
+  <div className="station-label">{ label }</div>
   )
 }
 

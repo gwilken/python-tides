@@ -127,6 +127,8 @@ class Map extends Component {
   updateHarmonics = (station) => {
     console.log('station', station)
     
+    // TODO: loading states, error states
+
     let { harcon_id, id } = station
     
     console.log('harcon_id:', harcon_id, 'id:', id)
