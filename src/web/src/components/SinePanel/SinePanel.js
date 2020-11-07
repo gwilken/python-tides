@@ -6,6 +6,7 @@ import Toolbar from '../Toolbar/Toolbar'
 import StationLabel from '../StationLabel/StationLabel'
 import { normalize } from '../../utils/utils'
 
+
 const SinePanel = ({harmonics, selectedStation}) => {
   const availableOutputs = useMidiOutputs([])
   const [globalSpeed, setGlobalSpeed] = useState(.05)
@@ -15,7 +16,6 @@ const SinePanel = ({harmonics, selectedStation}) => {
 
   let sines = [];
   
-  
   if (harmonics && harmonics['HarmonicConstituents'] && harmonics['HarmonicConstituents'].length > 0) {
     const amps = harmonics.HarmonicConstituents.map(entry => entry.amplitude)
     const max = Math.max(...amps)
@@ -23,9 +23,9 @@ const SinePanel = ({harmonics, selectedStation}) => {
     
     let filtered = harmonics['HarmonicConstituents'].filter(entry => entry['amplitude'] > 0)
 
-    sines = filtered.slice(0, 8).map((entry, index) => (
+    sines = filtered.slice(0, 1).map((entry, index) => (
       <SinewaveContainer
-        number={entry['number']}
+        number={index + 1}
         name={entry['name']}
         description={entry['description']}
         amp={ normalize(entry['amplitude'], max, 0) }

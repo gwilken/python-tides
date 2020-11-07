@@ -3,6 +3,8 @@ import { render } from 'react-dom'
 
 import App from './components/App';
 
+console.log('UPDATE....')
+
 render(
   <React.StrictMode>
     <App />
