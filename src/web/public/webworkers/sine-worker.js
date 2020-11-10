@@ -4,7 +4,22 @@ let data;
 let context;
 let requestId;
 
-console.log('WORKER STARTED!')
+let currentTime;
+let currentValue = 0;
+
+let readAheadTime;
+let readAheadValue = 0;
+
+console.log('sine-worker start')
+
+// const metronome = new Worker('/webworkers/metronome-worker.js');
+
+// metronome.onmessage = (msg) => {
+//   // console.log(msg.data)
+//   postMessage(['queue-note', data.number, parseFloat(readAheadValue), readAheadTime - currentTime])
+// }
+
+
 
 onmessage = function(e) {
   let { action } = e.data
@@ -20,31 +35,33 @@ onmessage = function(e) {
     case 'update':
       console.log('update')
       data = {...e.data};
-      break;
-    }
-    
+    break;
+  }
+
     // return () => {
       //   cancelAnimationFrame(requestId)
-      // }
-      
-    }
+      // }      
+}
     
     
-  const render = (now) => {
+const render = () => {
   console.log('render')
-
   let then = 0;
   let elapsed;
   let beatAnimationState = false;
   let valueNormalizedLineWidth;
-  let scalingFactor = 10000
+  const scalingFactor = 10000
+  // const buffer = 1000; 
+  
   
   // where we read current value
   let readPosition = .5
-
+  
   const loop = (now) => {
+    currentTime = now;
+    readAheadTime = now + 500;
 
-    let beatsPerSecondInterval = 1000 / (data.tempo / 60);
+    // let beatsPerSecondInterval = 1000 / (data.tempo / 60);
     // let animationDuration = (1000 / (data.tempo / 60)) - 100;
 
     // if (now == undefined) {
@@ -57,26 +74,27 @@ onmessage = function(e) {
     if (data.isEnabled && data.globalRun) {
       // eslint-disable-next-line
       requestId = requestAnimationFrame(loop)
-    } else {
-      cancelAnimationFrame(requestId)
-    }
+    } 
+  
+  // else {
+  //   cancelAnimationFrame(requestId)
+  // }
 
-    elapsed = now - then;
+    // elapsed = now - then;
 
 
 
-    if (elapsed > beatsPerSecondInterval) {
-      then = now - (elapsed % beatsPerSecondInterval);
-      beatAnimationState = true;
+    // if (elapsed > beatsPerSecondInterval) {
+    //   then = now - (elapsed % beatsPerSecondInterval);
+    //   beatAnimationState = true;
       
-      postMessage(['beat', now])
 
       // handleData([valueRef.current, now])
 
       // setTimeout(() => {
       //   beatAnimationState = false
       // }, animationDuration)
-    }
+    // }
 
     context.rect(0, 0, data.width, data.height);
     context.fillStyle = '#badefd';
@@ -101,11 +119,14 @@ onmessage = function(e) {
       context.lineTo(x, data.height - (draw_y * data.height));
       // get value at read position and save for later
       if (x == Math.floor(readPosition * data.width)) {
-        // valueRef.current = normalize(y, 1, -1).toFixed(4)
+        currentValue = normalize(y, 1, -1).toFixed(4)
         valueNormalizedLineWidth = normalize(y * (1 - lineWidthRatio), 1.0, -1.0).toFixed(4)
+
+        let readAheadY = data.amp * (Math.sin(2 * Math.PI * data.freq * ((x / scalingFactor) + (readAheadTime / (scalingFactor / data.globalSpeed))) + parseFloat(data.phase) ));
+        readAheadValue =  normalize(readAheadY, 1, -1).toFixed(4)
       }
     }
-    
+  
     // fill under area
     context.stroke()
     context.lineTo(data.width + context.lineWidth, data.height); 
@@ -118,8 +139,10 @@ onmessage = function(e) {
     context.strokeStyle = 'orange';
     context.lineWidth = 2 * data.ratio; 
     context.moveTo((readPosition * data.width), data.height);
-    context.lineTo((readPosition * data.width), data.height - (valueNormalizedLineWidth * data.height));
+    // context.lineTo((readPosition * data.width), data.height - (valueNormalizedLineWidth * data.height));
+    context.lineTo((readPosition * data.width), 0);
     context.stroke();
+
     
     // draw center horizontal axis
     // context.beginPath();
@@ -138,20 +161,20 @@ onmessage = function(e) {
     context.strokeStyle = 'white';
     context.fillStyle = 'black';
     context.strokeText(
-      data.tempo, 
+      now, 
       data.width / 2, 
       data.height / 2);
     context.fillText(
-      data.tempo, 
+      now, 
       data.width / 2, 
       data.height / 2);
 
     // context.strokeText(
-    //   now, 
+    //   readAheadValue, 
     //   data.width / 2, 
     //   data.height / 4);
     // context.fillText(
-    //   now, 
+    //   readAheadValue, 
     //   data.width / 2, 
     //   data.height / 4);
 
@@ -171,7 +194,7 @@ onmessage = function(e) {
       data.mode == 'NOTE_ON' ? data.note : 64, 
       data.width - 20, 
       data.height / 2);
-    
+  
     // high range data.note
     context.textBaseline = "bottom";
     let highNote;
@@ -215,6 +238,5 @@ onmessage = function(e) {
   }
 
   loop();
-
 }
 

@@ -1,4 +1,4 @@
-import MIDI_NOTES from '../../../constants/midi-notes'
+import MIDI_NOTES from '../../../../../constants/midi-notes'
 // import CC_LIST from '../../../constants/midi-cc-list'
 
 const SelectNote = ({note, setNote}) => {

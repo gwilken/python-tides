@@ -3,13 +3,13 @@ import './App.scss';
 import { useState, useEffect } from 'react';
 
 import Map from './Map/Map';
-import SinePanel from './SinePanel/SinePanel';
-
+import AudioPanel from './AudioPanel/AudioPanel';
+import testData from './test-data';
 
 function App() {
   const [stations, setStations] = useState([]);
   const [selectedStation, setSelectedStation] = useState();
-  const [harmonics, setHarmonics] = useState([]);
+  const [harmonics, setHarmonics] = useState(testData);
 
   useEffect(() => {
     fetch('/stations/stations.geojson')
@@ -22,16 +22,16 @@ function App() {
   return (
     <div className="fullscreen-container">
 
-      <SinePanel 
+      <AudioPanel 
         harmonics={harmonics}
         selectedStation={selectedStation}
       />  
       
-      <Map 
+      {/* <Map 
         stations={stations} 
         setHarmonics={setHarmonics}
         setSelectedStation={setSelectedStation}
-      />
+      /> */}
     
     </div>
   );

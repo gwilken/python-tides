@@ -12,9 +12,10 @@ const useMidiOutputs = () => {
         const handleStateChange = (e) => {
           setOutputs([...midi.outputs.values()])
         }
-
+        
         midi.addEventListener('statechange', handleStateChange);
-
+        
+        console.log([...midi.outputs.values()])
         setOutputs([...midi.outputs.values()])
       },
         (err) => console.log('Something went wrong', err));

@@ -1,4 +1,4 @@
-import CC_LIST from '../../../constants/midi-cc-list'
+import CC_LIST from '../../../../../constants/midi-cc-list'
 
 const SelectCC = ({ccParameter, setCC}) => {
   return (

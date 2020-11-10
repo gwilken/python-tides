@@ -56,15 +56,15 @@ body {
     }
   }
 
-  .sine-panel {
+  .audio-panel {
     position: absolute;
     margin-left: 8px;
     // width: 66%; 
-    pointer-events: none;
+    // pointer-events: none;
     
     .sines-container {
       position: relative;
-      pointer-events: none;
+      // pointer-events: none;
     }
   }
 

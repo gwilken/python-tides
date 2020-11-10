@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
 // import { getPixelRatio, normalize } from '../../../utils/utils';
-
+import noteScheduler from '../../../utils/NoteScheduler';
 
 const SineCanvas = ({
+  number,
   amp, 
   phase, 
   freq, 
@@ -27,11 +28,13 @@ const SineCanvas = ({
 
   const ratio = window.devicePixelRatio;
 
+  var audioCtx = new AudioContext();
+
  
   useEffect(() => {
     console.log('useEffect 1')
 
-    webWorkerRef.current = new Worker('./webworkers/sine-worker.js');
+    webWorkerRef.current = new Worker('/webworkers/sine-worker.js');
 
     let canvas = canvasRef.current;
     
@@ -52,6 +55,7 @@ const SineCanvas = ({
       webWorkerRef.current.postMessage({
         action: 'setup',
         canvas: offscreenRef.current,
+        number,
         ratio,
         amp, 
         phase, 
@@ -71,11 +75,12 @@ const SineCanvas = ({
 
  
   useEffect(() => {
-    console.log('useEffect 2')
+    // console.log('useEffect 2', audioCtx.currentTime)
 
     if (webWorkerRef.current) {
       webWorkerRef.current.postMessage({
         action: 'update',
+        number,
         ratio,
         amp, 
         phase, 
@@ -92,7 +97,11 @@ const SineCanvas = ({
       });
 
       webWorkerRef.current.onmessage = (e) => {
-        console.log('msg:', e.data)
+          console.log('timestamp', e.data)
+          // console.log('now', Date.now())
+
+        // noteScheduler.enqueueTask( [() => { console.log('time:', e.data) }, window.performance.now() + 1000] )
+
       }
     }
   })

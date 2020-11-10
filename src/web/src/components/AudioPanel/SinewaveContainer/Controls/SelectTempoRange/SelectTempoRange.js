@@ -7,7 +7,7 @@ const SelectTempoRange = ({tempo, setTempo}) => {
         name="range-tempo"
         type="range"
         min="1"
-        max="1200"
+        max="480"
         value={tempo}
         step="1"
         onChange={(e) => setTempo(e.target.value)}

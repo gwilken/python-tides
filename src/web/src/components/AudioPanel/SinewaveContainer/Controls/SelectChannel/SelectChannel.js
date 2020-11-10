@@ -5,7 +5,7 @@ const SelectChannel = ({channels, setChannels, outputChannel, setOutputChannel})
 // let prevSelection = useRef();
 
 function createOptions() {
-  return channels.map((inUseStatus, index) => (
+  return channels && channels.map((inUseStatus, index) => (
     <option
       disabled={ (inUseStatus) }
       value={index}
