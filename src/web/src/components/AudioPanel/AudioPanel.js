@@ -20,7 +20,7 @@ const AudioPanel = ({harmonics, selectedStation}) => {
     
     let filtered = harmonics['HarmonicConstituents'].filter(entry => entry['amplitude'] > 0)
 
-    sines = filtered.slice(0, 5)
+    sines = filtered.slice(0, 1)
   }
 
 

@@ -3,10 +3,33 @@
   flex-direction: column;
   
   canvas.sines-canvas {
-      width: 600px;
-      height: 120px;
-      margin-top: 15px;
+      width: 500px;
+      height: 75px;
+      display: none;
     }
+  
+  .wrapper {
+    position: relative;
+    border-radius: 5px;
+    margin-top: 15px;
+
+    .read-head {
+      position: absolute;
+      width: 2px;
+      background-color: orange;
+      left: 50%;
+      height: 100%;
+    }
+
+    .sine-div {
+      position: absolute;
+      background-color: #badefd;
+      left: -50%;
+      width: 1500px; 
+      height: 75px;
+      background-size: contain;
+    }
+  }
 
 }
 
