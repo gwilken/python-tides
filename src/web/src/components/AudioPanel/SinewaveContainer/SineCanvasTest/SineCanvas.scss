@@ -3,8 +3,8 @@
   flex-direction: column;
   
   canvas.sines-canvas {
-      width: 500px;
-      height: 75px;
+      width: 1000px;
+      height: 150px;
       display: none;
     }
   
@@ -21,6 +21,13 @@
       height: 100%;
     }
 
+    .lookahead-head {
+      position: absolute;
+      width: 2px;
+      background-color: rgb(255, 0, 0);
+      height: 100%;
+    }
+
     .sine-div {
       position: absolute;
       background-color: #badefd;
@@ -28,6 +35,7 @@
       width: 1500px; 
       height: 75px;
       background-size: contain;
+      // background-repeat-x: no-repeat;
     }
   }
 

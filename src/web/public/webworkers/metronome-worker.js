@@ -1,11 +1,24 @@
 console.log('metro start');
 
-let interval = 100;
+let interval = 25;
 let intervalId;
 
-intervalId = setInterval(() => {
-  postMessage('tick');
-}, interval);
+onmessage = function (e) {
+  if (e.data == 'start') {
+    intervalId = setInterval(() => {
+      postMessage('tick');
+    }, interval);
+  }
+
+  if (e.data == 'stop') {
+    clearInterval(intervalId)
+  }
+
+  if (e.data.interval) {
+    interval = e.data.interval
+  }
+}
+
 
 
 
