@@ -5,19 +5,19 @@ const testData = {
       "number": 1,
       "name": "M2",
       "description": "Principal lunar semidiurnal constituent",
-      "amplitude": 0.61,
+      "amplitude": 1,
       "phase_GMT": 66.9,
-      "phase_local": 281.9,
-      "speed": 28.984104
+      "phase_local": 0,
+      "speed": .05
     },
     {
       "number": 2,
-      "name": "S2",
-      "description": "Principal solar semidiurnal constituent",
-      "amplitude": 0.17,
-      "phase_GMT": 88.2,
-      "phase_local": 298.2,
-      "speed": 30
+      "name": "M2",
+      "description": "Principal lunar semidiurnal constituent",
+      "amplitude": 1,
+      "phase_GMT": 66.9,
+      "phase_local": 0,
+      "speed": 2
     },
     {
       "number": 3,

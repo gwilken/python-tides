@@ -12,6 +12,9 @@
     position: relative;
     border-radius: 5px;
     margin-top: 15px;
+    width: 500px;
+    height: 75px;
+    overflow: hidden;
 
     .read-head {
       position: absolute;
@@ -32,9 +35,11 @@
       position: absolute;
       background-color: #badefd;
       left: -50%;
-      width: 1500px; 
+      min-width: 1500px; 
       height: 75px;
       background-size: contain;
+      background-repeat-y: no-repeat;
+      background-position: left bottom;
       // background-repeat-x: no-repeat;
     }
   }

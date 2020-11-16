@@ -10,21 +10,33 @@ onmessage = function(e) {
   // save calc in array so we dont have to recalc every tick
   if (arr.length === 0) {
     // scale the sinewave so it fits in the container at exact repeat of period
-    let period = Math.PI * 2 / speed;
+    let period = (Math.PI * 2) / speed;
     let scalingFactor = period / (width / 3);
+
+    console.log(' amplitude, speed, phase_local',  amplitude, speed, phase_local)
+
+    console.log('period', period)
 
     let lineWidthRatio = lineWidth / height;
 
-    for (let x = 0; x < width; x++) {
-      let y = amplitude * Math.sin(speed * (x * scalingFactor) + phase_local);
+    for (let x = 0; x < period; x += .01) {
+      // let y = amplitude * Math.sin(speed * (x * scalingFactor) + phase_local);
+      let y = amplitude * (Math.sin(speed * x + phase_local));
+      // let y = amplitude * (Math.sin(2 * Math.PI * speed * x + phase_local));
+
+
       // normalized and offset for lineWidth
-      let draw_y = normalize(y * (1 - lineWidthRatio), 1.0, -1.0)
+      // let draw_y = normalize(y * (1 - lineWidthRatio), 1.0, -1.0)
       // flip the wave because canvas 0,0 starts at upper left, not lower right
-      arr.push({
-        y: height - (draw_y * height).toFixed(0),
-        value: parseFloat(y.toFixed(2))
-      });
+      arr.push(
+        // y: height - (draw_y * height).toFixed(0),
+        // y: y.toFixed(3),
+        // value: parseFloat(y.toFixed(2))
+        parseFloat(y.toFixed(3))
+      );
     }
+
+    // console.log(arr.length * period)
   } 
 
   postMessage(arr)

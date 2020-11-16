@@ -1,18 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 
 import SelectMode from './SelectMode/SelectMode';
+import SelectModeRange from './SelectModeRange/SelectModeRange'
 import SelectNote from './SelectNote/SelectNote'
 import SelectCC from './SelectCC/SelectCC'
-import SelectModeRange from './SelectModeRange/SelectModeRange'
-import SelectDeviceId from './SelectDeviceId/SelectDeviceId';
 import SelectChannel from './SelectChannel/SelectChannel';
-import SelectTempoRange from './SelectTempoRange/SelectTempoRange'
-
-import useMidiOutputs from '../../../../hooks/useMidiOutputs'
 
 
 const Controls = ({ globalRun, globalSpeed }) => {
-  const availableOutputs = useMidiOutputs([])
   const [channels, setChannels] = useState(new Array(16).fill(0))
 
   const prevEnableRef = useRef(true);
@@ -26,23 +21,11 @@ const Controls = ({ globalRun, globalSpeed }) => {
   const [modeRange, setModeRange] = useState(127)
   
   // output setting
-  const [outputDeviceId, setOutputDeviceId] = useState()
+  // const [outputDeviceId, setOutputDeviceId] = useState()
   const [outputChannel, setOutputChannel] = useState(0)
-  const [tempo, setTempo] = useState(120)
 
   // ui settings
   const [collapsed, setCollapsed] = useState(true);
-
-
-  // check if selected output was removed
-  useEffect(() => {
-    if (availableOutputs && availableOutputs.length > 0) {
-      let ids = availableOutputs.map(output => output.id)
-      if(ids.indexOf(outputDeviceId) === -1) {
-        setOutputDeviceId(null)
-      }
-    }
-  }, [availableOutputs])
 
 
   const handleEnableClick = () => {
@@ -90,11 +73,6 @@ const Controls = ({ globalRun, globalSpeed }) => {
           
 
           <div className="output-container">
-            <SelectDeviceId 
-              availableOutputs={availableOutputs}
-              outputDeviceId={outputDeviceId}
-              setOutputDeviceId={setOutputDeviceId}
-            />
 
             <SelectChannel 
               channels={channels}
@@ -103,10 +81,7 @@ const Controls = ({ globalRun, globalSpeed }) => {
               setOutputChannel={setOutputChannel}
             />
 
-            <SelectTempoRange 
-              tempo={tempo}
-              setTempo={setTempo}
-            />
+
           </div>
         </div>
 

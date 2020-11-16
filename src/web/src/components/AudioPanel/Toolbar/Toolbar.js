@@ -1,3 +1,7 @@
+import { useState, useEffect } from 'react';
+
+import SelectDeviceId from './SelectDeviceId/SelectDeviceId'
+import SelectTempoRange from './SelectTempoRange/SelectTempoRange'
 
 import './Toolbar.scss'
 
@@ -8,12 +12,18 @@ import './Toolbar.scss'
 const Toolbar = ({ 
   globalSpeed, 
   setGlobalSpeed, 
+  availableOutputs,
+  outputDeviceId,
+  setOutputDeviceId,
   setGlobalRun, 
   globalRun,
   globalCollapse, 
   setGlobalCollapse, 
   instanceKey, 
   setInstanceKey }) => {
+
+  const [tempo, setTempo] = useState(120)
+
 
   
   return (
@@ -33,8 +43,17 @@ const Toolbar = ({
           onChange={ (e) => setGlobalSpeed(e.target.value) } />
       </div>
 
-    
+      <SelectTempoRange 
+        tempo={tempo}
+        setTempo={setTempo}
+      />
       
+      <SelectDeviceId 
+        availableOutputs={availableOutputs}
+        outputDeviceId={outputDeviceId}
+        setOutputDeviceId={setOutputDeviceId}
+      />
+
       <div onClick={ () => setGlobalRun(!globalRun)}>
         { globalRun ? 'all stop' : 'run' }
       </div>
