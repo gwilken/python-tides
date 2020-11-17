@@ -1,5 +1,5 @@
 import { useEffect, useRef, createRef } from 'react';
-import { getPixelRatio, normalize } from '../../../../utils/utils';
+import { getPixelRatio, normalize, rotateArrLeft, rotateArrRight } from '../../../../utils/utils';
 import noteScheduler from '../../../../scripts/NoteScheduler';
 import useMidiOutputs from '../../../../hooks/useMidiOutputs'
 
@@ -12,17 +12,17 @@ const pixelRatio = window.devicePixelRatio;
 const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {  
   const availableOutputs = useMidiOutputs([])
 
-  const canvasRefs = useRef(sines.map(() => createRef()));
-  const contextRefs = useRef(sines.map(() => createRef()));
+  // const canvasRefs = useRef(sines.map(() => createRef()));
+  // const contextRefs = useRef(sines.map(() => createRef()));
   const divRefs = useRef(sines.map(() => createRef()));
-  const workerRefs = useRef(sines.map(() => createRef()));
+  // const workerRefs = useRef(sines.map(() => createRef()));
 
   let sinesDataArr = sines.map(() => [])
   let sinesCurrentVal = sines.map(() => [])
 
   // let tempCanvasData;
 
-  let globalSpeed = 5;
+  let globalSpeed = 1;
   let xPercentage = 0;
 
   //look ahead in % - actual amount is 3X this value
@@ -38,27 +38,21 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
   useEffect(() => {
     let metronome = new Worker('/webworkers/metronome-worker.js')
 
-    contextRefs.current = canvasRefs.current.map(ref => ref.current.getContext('2d'));
-
-    canvasRefs.current.map(({current}) => {
-      let computedWidth = getComputedStyle(current).getPropertyValue('width').slice(0, -2);
-      let computedHeight = getComputedStyle(current).getPropertyValue('height').slice(0, -2);
-      current.width = computedWidth * pixelRatio;
-      current.height = computedHeight * pixelRatio;
-      current.style.width = `${computedWidth}px`;
-      current.style.height = `${computedHeight}px`;
-    })
-
+    // save calc in array so we dont have to recalc every tick
     sines.forEach((data, index) => {
-      const ctx = contextRefs.current[index];
-      const {amplitude, phase_local, speed} = data;          
-      const canvas = canvasRefs.current[index].current;
-      const {height} = canvas
+      const patternCanvas = document.createElement('canvas');
+      const patternContext = patternCanvas.getContext('2d');
 
-      let lineWidth = 5 * pixelRatio
+      const canvas = document.createElement('canvas');
+      const canvasContext = canvas.getContext('2d');
+
+      const {amplitude, phase_local, speed} = data;          
+      const height = 75;
+      let width;
+
+      let lineWidth = 2
       let lineWidthRatio = lineWidth / height
 
-      // save calc in array so we dont have to recalc every tick
       let period = (Math.PI * 2) / speed;
   
       for (let x = 0; x < period; x += .005) {
@@ -71,31 +65,49 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
         });
       }
       
-      canvas.width = sinesDataArr[index].length;
-      canvas.style.width = `${sinesDataArr[index].length}px`;
-  
-      ctx.beginPath();
-      ctx.moveTo(0, height);
-      ctx.lineWidth = 5 * pixelRatio;
-      ctx.strokeStyle = '#0e85ea';
+      width = sinesDataArr[index].length;
 
-      for (let pos in sinesDataArr[index]) {
-        let y = sinesDataArr[index][pos].drawY;
+      patternCanvas.width = width;
+      patternCanvas.height = height;
+
+      patternContext.beginPath();
+      patternContext.moveTo(0, height);
+      patternContext.lineWidth = lineWidth;
+      patternContext.strokeStyle = '#0e85ea';
+
+      let lastY;
+
+      for (let [pos, obj] of sinesDataArr[index].entries() ){
         // flip the wave because canvas 0,0 starts at upper left, not lower right
-        ctx.lineTo(pos, height - (y * height));
+        let y = height - (obj.drawY * height)
+        patternContext.lineTo(pos, y);
+        lastY = y;
       }
 
-      ctx.lineTo(canvas.width + (ctx.lineWidth * 2), height);
-      ctx.lineTo(0, height)
-      ctx.stroke();
-      ctx.fillStyle = 'white';
-      ctx.fill(); 
+      // we do this to avoid a slight visible line between repeats
+      patternContext.lineTo(width + (lineWidth * 2), lastY);
+      patternContext.lineTo(width + lineWidth, height);
+      patternContext.lineTo(0, height)
+      patternContext.stroke();
+      patternContext.fillStyle = 'white';
+      patternContext.fill(); 
 
-      let tempCanvasData = canvasRefs.current[index].current.toDataURL()
+      canvas.width = width * 3;
+      canvas.height = height
 
-      divRefs.current[index].current.style.backgroundImage = 'url('+ tempCanvasData +')';
+      const pattern = canvasContext.createPattern(patternCanvas,'repeat-x');
+      canvasContext.rect(0, 0, width * 3, height);
+      canvasContext.fillStyle = pattern;
+      canvasContext.fill();
+
+      const image = canvas.toDataURL();
+
+      divRefs.current[index].current.style.backgroundImage = `url(${image})`;
+      // console.log(divRefs)
     })
 
+
+  
 
     ////// ANIMATION START //////////
 
@@ -112,12 +124,17 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
 
     metronome.postMessage('start')
 
-    const draw = (now) => {
-      // requestId = requestAnimationFrame(draw);
+    const loop = (now) => {
+      // requestId = requestAnimationFrame(loop);
 
-      let count = (now / (1 * globalSpeed))
+      let count = (now / (10 * globalSpeed))
 
-      console.log(count)
+      function draw(index) {
+   
+      }
+
+
+      // console.log('count', count.toFixed())
 
       elapsed = now - then;
       then = now
@@ -132,8 +149,13 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
       
       
       sines.forEach((data, index) => {
-        divRefs.current[index].current.style.transform = 'translateX(-' + count  + 'px)'
-        
+        // divRefs.current[index].current.style.transform = 'translateX(-' + count  + 'px)'
+        // rotateArrLeft, rotateArrRight
+
+        // console.log(rotateArrLeft(sinesDataArr[index], count.toFixed()));
+
+        // draw(index);
+
         while (noteScheduler.channels[index].notesInQueue.length && noteScheduler.channels[index].notesInQueue[0].time < now) {
           // currentNote = notesInQueue[0].note;
           noteScheduler.channels[index].notesInQueue.splice(0,1);   // remove note from queue
@@ -168,7 +190,7 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
       lookAheadPercentage += globalSpeed;
     }
     
-      draw();
+      loop();
     
   }, [])
 
@@ -178,18 +200,11 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
   return (
     <div className="canvas-container">
       {
-        sines.map((data, index) => (
-          <div>
-          <canvas
-            key={index} 
-            className="sines-canvas" 
-            ref={ canvasRefs.current[index] } />
-     
-            <div className="wrapper">
-              <div className="sine-div" ref={ divRefs.current[index] }></div>
-              <div className="read-head"></div>
-              <div className="lookahead-head" style={{ 'left': 50 + lookAheadAmount * 3 + '%' }}></div>
-            </div>
+        sines.map((data, index) => (  
+          <div className="wrapper">
+            <div className="sine-div" ref={ divRefs.current[index] }></div>
+            {/* <div className="read-head"></div>
+            <div className="lookahead-head" style={{ 'left': 50 + lookAheadAmount * 3 + '%' }}></div> */}
           </div>
         ))
       }

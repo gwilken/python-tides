@@ -1,13 +1,7 @@
 .canvas-container {
   display: flex;
   flex-direction: column;
-  
-  canvas.sines-canvas {
-      width: 1000px;
-      height: 150px;
-      display: none;
-    }
-  
+    
   .wrapper {
     position: relative;
     border-radius: 5px;
@@ -34,12 +28,16 @@
     .sine-div {
       position: absolute;
       background-color: #badefd;
-      left: -50%;
-      min-width: 1500px; 
+      width: 100%;
+
+      // left: -50%;
+      // min-width: 1500px; 
       height: 75px;
-      background-size: contain;
+      // background-size: contain;
       background-repeat-y: no-repeat;
       background-position: left bottom;
+      // background-repeat-x: no-repeat;
+
       // background-repeat-x: no-repeat;
     }
   }

@@ -38,5 +38,15 @@ const range = (start, stop, step) => {
 };
 
 
-export { getPixelRatio, normalize, range }
+const rotateArrLeft = (arr, num) => {
+  return arr.slice(num).concat(arr.slice(0, num))
+}
+
+
+const rotateArrRight = (arr, num) => {
+  return arr.slice(-1 * num).concat(arr.slice(0, -1 * num))
+}
+
+
+export { getPixelRatio, normalize, range, rotateArrLeft, rotateArrRight }
 
