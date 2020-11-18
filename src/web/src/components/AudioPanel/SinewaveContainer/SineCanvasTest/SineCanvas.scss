@@ -12,9 +12,9 @@
 
     .read-head {
       position: absolute;
-      width: 2px;
+      width: 1px;
       background-color: orange;
-      left: 50%;
+      left: 250px;
       height: 100%;
     }
 
@@ -28,15 +28,15 @@
     .sine-div {
       position: absolute;
       background-color: #badefd;
-      width: 100%;
+      width: 1500px;
 
-      // left: -50%;
+      // left: -33%;
       // min-width: 1500px; 
       height: 75px;
       // background-size: contain;
       background-repeat-y: no-repeat;
       background-position: left bottom;
-      // background-repeat-x: no-repeat;
+      background-repeat-x: no-repeat;
 
       // background-repeat-x: no-repeat;
     }

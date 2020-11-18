@@ -12,23 +12,27 @@ const pixelRatio = window.devicePixelRatio;
 const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {  
   const availableOutputs = useMidiOutputs([])
 
-  // const canvasRefs = useRef(sines.map(() => createRef()));
-  // const contextRefs = useRef(sines.map(() => createRef()));
   const divRefs = useRef(sines.map(() => createRef()));
-  // const workerRefs = useRef(sines.map(() => createRef()));
+
+  // keep track of number pattern repeats in canvas. used for animation
+  const repeatRefs = useRef(sines.map(() => createRef()));
+  const translateXRefs = useRef(sines.map(() => createRef()));
+
 
   let sinesDataArr = sines.map(() => [])
   let sinesCurrentVal = sines.map(() => [])
 
   // let tempCanvasData;
 
-  let globalSpeed = 1;
+  let globalSpeed = 5;
   let xPercentage = 0;
 
   //look ahead in % - actual amount is 3X this value
   let lookAheadAmount = 1;
   let lookAheadPercentage = xPercentage + lookAheadAmount;
   
+
+  let start = window.performance.now();
 
   useEffect(() => {
     noteScheduler.setOutput(output)
@@ -38,80 +42,101 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
   useEffect(() => {
     let metronome = new Worker('/webworkers/metronome-worker.js')
 
-    // save calc in array so we dont have to recalc every tick
+    /////// DRAW SETUP START //////////
+
+    // save calc in array so we dont recalc every tick to get value
+    // we'll use css tranform translateX instead of redrawing every frame for performance
     sines.forEach((data, index) => {
       const patternCanvas = document.createElement('canvas');
       const patternContext = patternCanvas.getContext('2d');
 
       const canvas = document.createElement('canvas');
+      // const canvasContext = canvas.getContext('2d', { alpha: false });
       const canvasContext = canvas.getContext('2d');
 
       const {amplitude, phase_local, speed} = data;          
       const height = 75;
       let width;
 
-      let lineWidth = 2
+      let lineWidth = 4
       let lineWidthRatio = lineWidth / height
 
       let period = (Math.PI * 2) / speed;
   
-      for (let x = 0; x < period; x += .005) {
+      let tempDataArr = [];
+
+      for (let x = 0; x < period; x += .0025) {
         let y = amplitude * (Math.sin(speed * x + phase_local));
         let drawY = normalize(y * (1 - lineWidthRatio), 1.0, -1.0).toFixed(4)
         
-        sinesDataArr[index].push({
-          y: parseFloat(y.toFixed(3)),
+        tempDataArr.push({
+          y: parseFloat(y.toFixed(4)),
           drawY
         });
+        // sinesDataArr[index].push({
+        //   y: parseFloat(y.toFixed(4)),
+        //   drawY
+        // });
       }
       
-      width = sinesDataArr[index].length;
 
-      patternCanvas.width = width;
-      patternCanvas.height = height;
+      // width = sinesDataArr[index].length;
+      let tempWidth = tempDataArr.length;
 
-      patternContext.beginPath();
-      patternContext.moveTo(0, height);
-      patternContext.lineWidth = lineWidth;
-      patternContext.strokeStyle = '#0e85ea';
+      // we want width of final div to be at least 1500px (triple the wrapper div's 500px)
+      // and repeat pattern with out cutting off
+      let canvasWidth = 1500 + (tempWidth - (((1500 / tempWidth) % 1) * tempWidth));
+      canvas.width = canvasWidth
+
+      // save num of repeats. will need for animation later.
+      let numOfRepeats = canvasWidth / tempWidth;
+      repeatRefs.current[index].current = numOfRepeats
+
+      console.log('numOfRepeats', numOfRepeats)
+
+      canvas.height = height
+
+      canvasContext.beginPath();
+      canvasContext.moveTo(0, height);
+      canvasContext.lineWidth = lineWidth;
+      canvasContext.strokeStyle = '#0e85ea';
 
       let lastY;
 
-      for (let [pos, obj] of sinesDataArr[index].entries() ){
-        // flip the wave because canvas 0,0 starts at upper left, not lower right
-        let y = height - (obj.drawY * height)
-        patternContext.lineTo(pos, y);
-        lastY = y;
+      // loop through our draw array to repeat pattern
+      for (let i = 0; i < canvasWidth; i++) {
+        let sinesDataIndex = i % tempDataArr.length;
+        let tempY = tempDataArr[sinesDataIndex].drawY;
+        // flip the sine wave because canvas 0,0 starts at upper left, not lower right
+        let flipepdY = height - (tempY * height);
+        canvasContext.lineTo(i, flipepdY);
+
+        sinesDataArr[index].push(tempDataArr[sinesDataIndex].y);
+
+        lastY = flipepdY;
       }
 
-      // we do this to avoid a slight visible line between repeats
-      patternContext.lineTo(width + (lineWidth * 2), lastY);
-      patternContext.lineTo(width + lineWidth, height);
-      patternContext.lineTo(0, height)
-      patternContext.stroke();
-      patternContext.fillStyle = 'white';
-      patternContext.fill(); 
+      console.log('sinesDataArr[index]', sinesDataArr[index]);
 
-      canvas.width = width * 3;
-      canvas.height = height
-
-      const pattern = canvasContext.createPattern(patternCanvas,'repeat-x');
-      canvasContext.rect(0, 0, width * 3, height);
-      canvasContext.fillStyle = pattern;
-      canvasContext.fill();
+      
+      // we do this with lastY to avoid a slight visible line between repeats
+      canvasContext.lineTo(canvasWidth + (lineWidth * 2), lastY);
+      canvasContext.lineTo(canvasWidth + lineWidth * 2, height);
+      canvasContext.lineTo(0, height)
+      canvasContext.stroke();
+      canvasContext.fillStyle = 'white';
+      canvasContext.fill(); 
 
       const image = canvas.toDataURL();
 
       divRefs.current[index].current.style.backgroundImage = `url(${image})`;
-      // console.log(divRefs)
+      divRefs.current[index].current.style.width = `${canvasWidth}px`;
     })
 
 
-  
-
     ////// ANIMATION START //////////
 
-
+    
     let then = 0;
     let elapsed;
     let requestId;
@@ -125,48 +150,63 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
     metronome.postMessage('start')
 
     const loop = (now) => {
-      // requestId = requestAnimationFrame(loop);
+      requestId = requestAnimationFrame(loop);
 
-      let count = (now / (10 * globalSpeed))
-
-      function draw(index) {
-   
+      if (now === undefined) {
+        now = window.performance.now();
       }
-
-
-      // console.log('count', count.toFixed())
 
       elapsed = now - then;
       then = now
-
-      // if (xPercentage >= 33.33333) {
-      //   xPercentage = 0;
-      // }
- 
-      // if (lookAheadPercentage >= 33.33333) {
-      //   lookAheadPercentage = 0;
-      // }
-      
       
       sines.forEach((data, index) => {
-        // divRefs.current[index].current.style.transform = 'translateX(-' + count  + 'px)'
-        // rotateArrLeft, rotateArrRight
+        let repeat = repeatRefs.current[index].current;
+        let xOffset = (now / (100 * globalSpeed)) % (100 / repeat);
+        // let xOffset = 0;
 
-        // console.log(rotateArrLeft(sinesDataArr[index], count.toFixed()));
+        // console.log('xOffset', xOffset)
 
-        // draw(index);
+        // console.log((xOffset * repeat) * .01)
+
+        translateXRefs.current[index].current = xOffset;
+
+        divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
 
         while (noteScheduler.channels[index].notesInQueue.length && noteScheduler.channels[index].notesInQueue[0].time < now) {
           // currentNote = notesInQueue[0].note;
           noteScheduler.channels[index].notesInQueue.splice(0,1);   // remove note from queue
         }
 
-        if (sinesDataArr[index].length) {
-          // let arrIndex = Math.floor((sinesDataArr[index].length * (xPercentage * .01)) * 3)
+        let length = sinesDataArr[index].length;
+        let offsetPercent = xOffset * .01;
+
+        // console.log('offsetPercent', offsetPercent)
+
+        if (length) {
+          // gets us value at read head. 250 = half of wrapper width
+          let arrIndex = Math.floor((length * offsetPercent) + 250)
+  
+          // so we wrap around in case we over shoot length
+          console.log('val: ', sinesDataArr[index][arrIndex % length])
+
+
+          // console.log('1/6', sinesDataArr[index][Math.floor(length * .1666667)])
+          // let arrIndex = Math.floor( (length * (xOffset * .01)) * repeat )
           
-          // let lookAheadIndex = Math.floor((sinesDataArr[index].length * (lookAheadPercentage * .01)) * 3)
+          // 1/6th
+          // let readPosition = .1666666
+
+          // let percentOfRepeat = ((xOffset * repeat) * .01) * readPosition
+
+          // let arrIndex = Math.floor(length * percentOfRepeat);
+
+          // let lookAheadIndex = Math.floor((length * (lookAheadPercentage * .01)) * 3)
           
-          // let val = sinesDataArr[index][arrIndex].value
+          // if ( sinesDataArr[index][arrIndex]) {
+            // let val = sinesDataArr[index][arrIndex];
+            // console.log(arrIndex, val);
+          // }
+
           // let lookAheadVal = sinesDataArr[index][lookAheadIndex].value
           // let scheduleTimeOffset = ((lookAheadAmount * .3) / (globalSpeed * 16.66)) * 1000
           
@@ -185,16 +225,11 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
       
         }
       })
-    
-      xPercentage += globalSpeed;
-      lookAheadPercentage += globalSpeed;
     }
     
-      loop();
+    loop();
     
   }, [])
-
-
 
 
   return (
@@ -203,8 +238,8 @@ const SineCanvas = ({ sines, isEnabled, globalRun, output }) => {
         sines.map((data, index) => (  
           <div className="wrapper">
             <div className="sine-div" ref={ divRefs.current[index] }></div>
-            {/* <div className="read-head"></div>
-            <div className="lookahead-head" style={{ 'left': 50 + lookAheadAmount * 3 + '%' }}></div> */}
+            <div className="read-head"></div>
+            {/* <div className="lookahead-head" style={{ 'left': 50 + lookAheadAmount * 3 + '%' }}></div> */}
           </div>
         ))
       }
