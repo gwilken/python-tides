@@ -10,8 +10,7 @@ class NoteScheduler {
       })
     )
     
-
-    this.scheduleAheadTime = 1000;
+    this.scheduleAheadTime = 500;
     this.tempo = 120;
     this.output = null;
   }
@@ -42,24 +41,33 @@ class NoteScheduler {
     // let scheduleTimeOffset = 1000
   
     if ( this.output) {
-      let modeRange = 12;
+      let modeRange = 24;
       let note = 69;
   
-      // let midiValue = Math.floor(parseFloat(currentVal) * parseInt(modeRange)) + (parseInt(note) - (Math.floor(parseInt(modeRange) / 2)))
-      // let clampedMidiValue = Math.min(Math.max(midiValue, 0), 127);
+      
+      let value = Math.floor(parseFloat(midiValue) * parseInt(modeRange)) + (parseInt(note) - (Math.floor(parseInt(modeRange) / 2)))
+      // console.log('value', value)
+      let clampedMidiValue = Math.min(Math.max(value, 0), 127);
       // let clampedMidiValue = 69;
   
-      console.log(midiValue)
-      var noteOnMessage = [0x90 | channel, midiValue, 0x7f];    // note on, middle C, full velocity
+      console.log(clampedMidiValue)
+      var noteOnMessage = [0x90 | channel, clampedMidiValue, 0x7f];    // note on, middle C, full velocity
   
       this.output.send( noteOnMessage, window.performance.now() + timeOffset );  //omitting the timestamp means send immediately.
-      this.output.send( [0x80 | channel, midiValue, 0x40], window.performance.now() + timeOffset + this.channels[channel].noteLength ); // Inlined array creation- note off, middle C,                                                               
+      this.output.send( [0x80 | channel, clampedMidiValue, 0x40], window.performance.now() + timeOffset + this.channels[channel].noteLength ); // Inlined array creation- note off, middle C,                                                               
     }
   }
 
   scheduler(midiValue, timeOffset, channel) {
     while ( this.channels[channel].nextNoteTime < window.performance.now() + this.scheduleAheadTime ) {
-        this.scheduleNote( { beat: this.channels[channel].current16thNote, time: this.channels[channel].nextNoteTime, midiValue, timeOffset, channel } );
+        this.scheduleNote({
+          beat: this.channels[channel].current16thNote,
+          time: this.channels[channel].nextNoteTime,
+          midiValue,
+          timeOffset,
+          channel 
+        });
+        
         this.nextNote(channel);
     }
   }

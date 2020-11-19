@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import SelectMode from './SelectMode/SelectMode';
 import SelectModeRange from './SelectModeRange/SelectModeRange'
@@ -6,48 +6,30 @@ import SelectNote from './SelectNote/SelectNote'
 import SelectCC from './SelectCC/SelectCC'
 import SelectChannel from './SelectChannel/SelectChannel';
 
+import './Controls.scss';
 
-const Controls = ({ globalRun, globalSpeed }) => {
-  const [channels, setChannels] = useState(new Array(16).fill(0))
-
+const Controls = (props) => {
   const prevEnableRef = useRef(true);
-
-  const [isEnabled, setEnabled] = useState(prevEnableRef.current);
-  
-  // mapping settings
-  const [mode, setMode] = useState('NOTE_ON')
-  const [note, setNote] = useState('69')
-  const [ccParameter, setCC] = useState(0x03)
-  const [modeRange, setModeRange] = useState(127)
-  
-  // output setting
-  // const [outputDeviceId, setOutputDeviceId] = useState()
-  const [outputChannel, setOutputChannel] = useState(0)
-
-  // ui settings
-  const [collapsed, setCollapsed] = useState(true);
-
 
   const handleEnableClick = () => {
     prevEnableRef.current = !prevEnableRef.current
-    setEnabled(prevEnableRef.current)
+    props.setEnabled(prevEnableRef.current)
   }
-
 
   let SecondarySelect;
 
-  if (mode == 'NOTE_ON') {
+  if (props.mode == 'NOTE_ON') {
     SecondarySelect =
       <SelectNote 
-        mode={mode}
-        note={note}
-        setNote={setNote}
+        mode={props.mode}
+        note={props.note}
+        setNote={props.setNote}
       />;
-  } else if (mode == 'CC') {
+  } else if (props.mode == 'CC') {
     SecondarySelect = 
       <SelectCC 
-        ccParameter={ccParameter}
-        setCC={setCC}
+        ccParameter={props.ccParameter}
+        setCC={props.setCC}
       />;
   }
 
@@ -58,16 +40,16 @@ const Controls = ({ globalRun, globalSpeed }) => {
         <div className="controls-container">
           <div className="mode-container">
             <SelectMode 
-              mode={mode}
-              setMode={setMode}
+              mode={props.mode}
+              setMode={props.setMode}
             />
 
             { SecondarySelect }
 
             <SelectModeRange 
-              mode={mode}
-              modeRange={modeRange}
-              setModeRange={setModeRange}
+              mode={props.mode}
+              modeRange={props.modeRange}
+              setModeRange={props.setModeRange}
             />
           </div>
           
@@ -75,10 +57,10 @@ const Controls = ({ globalRun, globalSpeed }) => {
           <div className="output-container">
 
             <SelectChannel 
-              channels={channels}
-              setChannels={setChannels}
-              outputChannel={outputChannel}
-              setOutputChannel={setOutputChannel}
+              channels={props.channels}
+              setChannels={props.setChannels}
+              outputChannel={props.outputChannel}
+              setOutputChannel={props.setOutputChannel}
             />
 
 
@@ -90,22 +72,22 @@ const Controls = ({ globalRun, globalSpeed }) => {
             <svg 
               onClick={ handleEnableClick }>
               <circle 
-                className= { isEnabled && globalRun ? 'enabled' : ''}
+                className= { props.isEnabled && props.globalRun ? 'enabled' : ''}
                 cx="15"
                 cy="15"
                 r="15"
               />
 
-              { collapsed &&
+              { props.collapsed &&
                 <text x="50%" y="50%" textAnchor="middle" fill="white" dy=".3em">
-                  { parseInt(outputChannel) + 1 }
+                  { parseInt(props.outputChannel) + 1 }
                 </text>
               }
             </svg>
           </div>
 
           <div className="button-collapse"
-            onClick={ () => setCollapsed(!collapsed) }>
+            onClick={ () => props.setCollapsed(!props.collapsed) }>
             <svg viewBox="0 0 30 50">
               <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <g fill="#000000">

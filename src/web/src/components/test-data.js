@@ -8,7 +8,7 @@ const testData = {
       "amplitude": 1,
       "phase_GMT": 66.9,
       "phase_local": 0,
-      "speed": 5
+      "speed": 10
     },
     {
       "number": 2,

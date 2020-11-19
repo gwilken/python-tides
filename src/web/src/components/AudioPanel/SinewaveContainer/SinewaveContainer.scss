@@ -1,92 +1,46 @@
 .sinewave-container {
-  position: relative;
-  border-radius: 5px;
-  margin: 5px 0;
-  padding: 10px 15px;
-  background-color: white;
-  pointer-events: all;
-  width: fit-content;
+  display: flex;
+  margin-top: 15px;
 
-  // .title-container {
-  //   margin: 0 0 8px 0;
-  //   text-transform: uppercase;
-  //   font-size: 12px;
-  //   user-select: none;
-  // }
+  .canvas-wrapper {
+    position: relative;
+    border-radius: 7px;
+    width: 500px;
+    height: 75px;
+    overflow: hidden;
+    margin-right: 7px;
 
-  .body-container {
-    display: flex;
-
-    .controls-container {
-      display: flex;
-      justify-content: space-around;
-      width: 370px;
-
-      .mode-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        margin-right: 15px;
-      }
-        
-      .output-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        margin-right: 15px;
-      }
+    .read-head {
+      position: absolute;
+      width: 1px;
+      background-color: orange;
+      left: 250px;
+      height: 100%;
     }
-  
-    .side-controls-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
 
-      .button-enable {
-        cursor: pointer;
-    
-        svg {
-          width: 30px;
-          height: 30px;
-          circle {
-            fill: lightgrey;
-      
-            &.enabled {
-              fill: #75e275;
-            }
-          }
-        }
-      }
+    .lookahead-head {
+      position: absolute;
+      width: 1px;
+      left: 275px;
+      background-color: rgb(255, 0, 0);
+      height: 100%;
+    }
 
-      .button-collapse {
-        position: absolute;
-        bottom: 15px;
-        cursor: pointer;
+    .sine-div {
+      position: absolute;
+      // background-color: #badefd;
+      width: 1500px;
 
-        svg {
-          width: 10px;
-          height: 25px;
+      // left: -33%;
+      // min-width: 1500px; 
+      height: 75px;
+      // background-size: contain;
+      background-repeat-y: no-repeat;
+      background-position: left bottom;
+      background-repeat-x: no-repeat;
 
-          g {
-            fill: silver;
-          }
-        }
-
-      }
+      // background-repeat-x: no-repeat;
     }
   }
 
-  &.collapsed {
-    .body-container {
-      .controls-container {
-        display: none;
-      }
-
-      .side-controls-container {
-        .button-collapse {
-          transform: rotate(180deg);
-        }
-      }
-    }
-  }
 }
