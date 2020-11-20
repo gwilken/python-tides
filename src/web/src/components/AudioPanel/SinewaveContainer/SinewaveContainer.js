@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, createRef } from 'react';
-import { normalize } from '../../../utils/utils';
+import { normalize } from '../../../scripts/utils';
 import noteScheduler from '../../../scripts/NoteScheduler';
 
 // import MidiDispatch from './MidiDispatch/MidiDispatch';
@@ -233,10 +233,11 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
             <div className="canvas-wrapper">
               <div className="sine-div" ref={ divRefs.current[index] }></div>
               <div className="read-head"></div>
-              <div className="lookahead-head"></div>
+              {/* <div className="lookahead-head"></div> */}
             </div>
             
-            <Controls 
+            <Controls
+              id={index} 
               channels={channels}
               setChannels={setChannels}
               isEnabled={isEnabled}

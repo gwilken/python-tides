@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux'
+import { setAvailableDevices } from '../../redux/actions';
 
 import SinewaveContainer from './SinewaveContainer/SinewaveContainer';
 import Toolbar from './Toolbar/Toolbar'
 import StationLabel from './StationLabel/StationLabel'
-import { normalize } from '../../utils/utils'
+import { normalize } from '../../scripts/utils'
 import useMidiOutputs from '../../hooks/useMidiOutputs'
 
 
@@ -12,18 +14,28 @@ const AudioPanel = ({harmonics, selectedStation}) => {
   const [globalRun, setGlobalRun] = useState(true)
   const [instanceKey, setInstanceKey] = useState(0);
 
+  const dispatch = useDispatch();
+
   const availableOutputs = useMidiOutputs([])
-  const [outputDeviceId, setOutputDeviceId] = useState()
+
+  console.log('availableOutputs', availableOutputs)
+
+  if (availableOutputs.length) {
+    dispatch(setAvailableDevices(availableOutputs));
+  }
+
+
+  // const [outputDeviceId, setOutputDeviceId] = useState()
 
   // check if selected output was removed
-  useEffect(() => {
-    if (availableOutputs && availableOutputs.length > 0) {
-      let ids = availableOutputs.map(output => output.id)
-      if(ids.indexOf(outputDeviceId) === -1) {
-        setOutputDeviceId(null)
-      }
-    }
-  }, [availableOutputs])
+  // useEffect(() => {
+  //   if (availableOutputs && availableOutputs.length > 0) {
+  //     let ids = availableOutputs.map(output => output.id)
+  //     if(ids.indexOf(outputDeviceId) === -1) {
+  //       setOutputDeviceId(null)
+  //     }
+  //   }
+  // }, [availableOutputs])
 
 
   let sines = [];
@@ -40,9 +52,9 @@ const AudioPanel = ({harmonics, selectedStation}) => {
 
   let output;
 
-  if (availableOutputs.length && outputDeviceId) {
-    output = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
-  }
+  // if (availableOutputs.length && outputDeviceId) {
+  //   output = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
+  // }
 
 
   return (
@@ -51,17 +63,7 @@ const AudioPanel = ({harmonics, selectedStation}) => {
         selectedStation={selectedStation}
       />
 
-      <Toolbar
-        globalSpeed={ globalSpeed }
-        setGlobalSpeed={ setGlobalSpeed }
-        globalRun={ globalRun }
-        setGlobalRun={ setGlobalRun }
-        availableOutputs={ availableOutputs }
-        outputDeviceId={ outputDeviceId }
-        setOutputDeviceId={ setOutputDeviceId }
-        instanceKey={ instanceKey }
-        setInstanceKey={ setInstanceKey }
-      />
+      <Toolbar />
 
       <div className="sines-container">
         <SinewaveContainer

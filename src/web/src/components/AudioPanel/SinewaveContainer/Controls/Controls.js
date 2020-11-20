@@ -56,12 +56,7 @@ const Controls = (props) => {
 
           <div className="output-container">
 
-            <SelectChannel 
-              channels={props.channels}
-              setChannels={props.setChannels}
-              outputChannel={props.outputChannel}
-              setOutputChannel={props.setOutputChannel}
-            />
+            <SelectChannel id={props.id} />
 
 
           </div>
