@@ -10,19 +10,19 @@ import useMidiOutputs from '../../hooks/useMidiOutputs'
 
 
 const AudioPanel = ({harmonics, selectedStation}) => {
-  const [globalSpeed, setGlobalSpeed] = useState(.02)
-  const [globalRun, setGlobalRun] = useState(true)
-  const [instanceKey, setInstanceKey] = useState(0);
-
   const dispatch = useDispatch();
+  const availableDevices = useMidiOutputs([])
 
-  const availableOutputs = useMidiOutputs([])
+  // const [globalSpeed, setGlobalSpeed] = useState(.02)
+  // const [globalRun, setGlobalRun] = useState(true)
+  // const [instanceKey, setInstanceKey] = useState(0);
 
-  console.log('availableOutputs', availableOutputs)
-
-  if (availableOutputs.length) {
-    dispatch(setAvailableDevices(availableOutputs));
-  }
+  useEffect(() => {
+    console.log('availableDevices', availableDevices)
+    if (availableDevices.length) {
+      dispatch(setAvailableDevices(availableDevices));
+    }
+  }, [availableDevices])
 
 
   // const [outputDeviceId, setOutputDeviceId] = useState()
@@ -47,7 +47,7 @@ const AudioPanel = ({harmonics, selectedStation}) => {
     
     let filtered = harmonics['HarmonicConstituents'].filter(entry => entry['amplitude'] > 0)
 
-    sines = filtered.slice(0, 8)
+    sines = filtered.slice(0, 2)
   }
 
   let output;
@@ -59,21 +59,17 @@ const AudioPanel = ({harmonics, selectedStation}) => {
 
   return (
     <div className="audio-panel">
-      <StationLabel 
-        selectedStation={selectedStation}
+      <StationLabel selectedStation={selectedStation} />
+
+      <SinewaveContainer
+        sines={ sines }
+        // globalRun={ globalRun }
+        // globalSpeed={ globalSpeed }
+        // key={ instanceKey }
+        // output={ output}
       />
 
       <Toolbar />
-
-      <div className="sines-container">
-        <SinewaveContainer
-          sines={ sines }
-          globalRun={ globalRun }
-          globalSpeed={ globalSpeed }
-          key={ instanceKey }
-          output={ output}
-        />
-      </div>
     </div>
   )
 }

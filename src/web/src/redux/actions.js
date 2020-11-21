@@ -110,5 +110,21 @@ export const setHarmonics = data => ({
 })
 
 
+export const setValue = ({id, value}) => ({
+  type: 'value/set',
+  payload: {
+    id,
+    value
+  }
+}) 
+
+
+export const setCurrentBeat = ({id, beat}) => ({
+  type: 'currentbeat/set',
+  payload: {
+    id,
+    beat
+  }
+}) 
 
 

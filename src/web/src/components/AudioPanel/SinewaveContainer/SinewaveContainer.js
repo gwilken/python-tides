@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef, createRef } from 'react';
+import { useEffect, useRef, createRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setValue, setCurrentBeat } from '../../../redux/actions';
+
 import { normalize } from '../../../scripts/utils';
 import noteScheduler from '../../../scripts/NoteScheduler';
 
@@ -11,47 +14,28 @@ import './SinewaveContainer.scss';
 
 
 const SinewaveContainer = ({ sines, globalRun, output }) => {  
-  const [channels, setChannels] = useState(new Array(16).fill(0))
-
   const prevEnableRef = useRef(true);
-
-  const [isEnabled, setEnabled] = useState(prevEnableRef.current);
-  
-  // mapping settings
-  const [mode, setMode] = useState('NOTE_ON')
-  const [note, setNote] = useState('69')
-  const [ccParameter, setCC] = useState(0x03)
-  const [modeRange, setModeRange] = useState(127)
-  
-  // output setting
-  // const [outputDeviceId, setOutputDeviceId] = useState()
-  const [outputChannel, setOutputChannel] = useState(0)
-
-  // ui settings
-  const [collapsed, setCollapsed] = useState(true);
-
-  // refs
   const divRefs = useRef(sines.map(() => createRef()));
   // keep track of number pattern repeats in canvas. used for animation
   const repeatRefs = useRef(sines.map(() => createRef()));
   const translateXRefs = useRef(sines.map(() => createRef()));
 
+  let sinesDataArr = useRef(sines.map(() => createRef()));
 
-  let sinesDataArr = sines.map(() => [])
+  console.log('sinesDataArr', sinesDataArr)
+
   let sinesCurrentVal = sines.map(() => [])
 
-  let globalSpeed = 500;
+  let speed = useSelector(state => state.speed);
+
+  const dispatch = useDispatch();
+
   let xPercentage = 0;
 
-  //look ahead in % - actual amount is 3X this value
-  let lookAheadAmount = 1;
-  let lookAheadPercentage = xPercentage + lookAheadAmount;
-  
 
-
-  useEffect(() => {
-    noteScheduler.setOutput(output)
-  }, [output])
+  // useEffect(() => {
+  //   noteScheduler.setOutput(output)
+  // }, [output])
 
 
   useEffect(() => {
@@ -109,6 +93,8 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
 
       let lastY;
 
+      sinesDataArr.current[index].current = [];
+
       // loop through our draw array repeating to fill canvas width, draw, and populate an arr of all values
       for (let i = 0; i < canvasWidth; i++) {
         let sinesDataIndex = i % tempDataArr.length;
@@ -116,7 +102,7 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
         // flip the sine wave because canvas 0,0 starts at upper left, not lower right
         let flipepdY = height - (tempY * height);
         canvasContext.lineTo(i, flipepdY);
-        sinesDataArr[index].push(tempDataArr[sinesDataIndex].y);
+        sinesDataArr.current[index].current.push(tempDataArr[sinesDataIndex].y);
         lastY = flipepdY;
       }
 
@@ -133,11 +119,12 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
       divRefs.current[index].current.style.backgroundImage = `url(${image})`;
       divRefs.current[index].current.style.width = `${canvasWidth}px`;
     })
+  }, [])
 
 
-    ////// ANIMATION START //////////
+  ////// ANIMATION START //////////
 
-    
+  useEffect(() => {
     let then = 0;
     let elapsed;
     let requestId;
@@ -157,11 +144,11 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
       }
 
       elapsed = now - then;
-      then = now
       
       sines.forEach((data, index) => {
         let repeat = repeatRefs.current[index].current;
-        let xOffset = (now / globalSpeed) % (100 / repeat);
+
+        let xOffset = (now / speed) % (100 / repeat);
 
         translateXRefs.current[index].current = xOffset;
 
@@ -169,10 +156,13 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
 
         while (noteScheduler.channels[index].notesInQueue.length && noteScheduler.channels[index].notesInQueue[0].time < now) {
           // currentNote = notesInQueue[0].note;
-          noteScheduler.channels[index].notesInQueue.splice(0,1);   // remove note from queue
+          let currentNote = noteScheduler.channels[index].notesInQueue.splice(0,1);   // remove note from queue
+          dispatch(setCurrentBeat({id: index, beat: currentNote[0] }))
+          // console.log(currentNote[0].beat)
         }
 
-        let length = sinesDataArr[index].length;
+        let length = sinesDataArr.current[index].current.length;
+
         let offsetPercent = xOffset * .01;
 
         if (length) {
@@ -180,86 +170,67 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
           let arrIndex = Math.floor((length * offsetPercent) + 250)
           
           // wrap around in case we over shoot arr length
-          let val = sinesDataArr[index][arrIndex % length];
-
-          if (setValue) {
-            setValue({
-              value: val,
-              time: now
-            })
-          }
+          let val = sinesDataArr.current[index].current[arrIndex % length];
+          
+          sinesCurrentVal[index] = val;
   
           let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
-          let lookAheadVal = sinesDataArr[index][lookAheadIndex % length];
+          let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
 
           // 25 = 375px read ahead minus 250px head position
-          let scheduleTimeOffset = (globalSpeed / elapsed) * 25;
+          let scheduleTimeOffset = (speed / 16.6666) * 25;
 
           // let midiValue = Math.floor(parseFloat(lookAheadVal) * parseInt(modeRange)) + (parseInt(note) - (Math.floor(parseInt(modeRange) / 2)))
           // let midiValue = Math.floor(parseFloat(lookAheadVal) * 24) + (63)
           // let clampedMidiValue = Math.min(Math.max(midiValue, 0), 127);
           // let currentLookAheadValue = clampedMidiValue
-          let currentChannel = index;
+          // let currentChannel = index;
           
           // metronome.onmessage = (e) => {
             // if (e.data === 'tick') {
               // console.log('tick', index)
-              noteScheduler.scheduler(lookAheadVal, scheduleTimeOffset, currentChannel);
+              // noteScheduler.scheduler(lookAheadVal, scheduleTimeOffset, currentChannel);
             // }
           // }
-      
+          
+          // every 50ms schedule future notes
+          if (elapsed > 50) {
+            noteScheduler.scheduler(lookAheadVal, scheduleTimeOffset, index);
+            then = now
+          }
+
         }
       })
     }
     
     loop();
     
-  }, [])
+    return () => cancelAnimationFrame(requestId);
+  }, [speed])
 
 
   let value = null;
   let setValue = null;
-  
-  const onChildMount = (dataFromChild) => {
-    value = dataFromChild[0];
-    setValue = dataFromChild[1];
-  };
 
   return (
-    <div>
+    <div className="sines-container">
       {
         sines.map((data, index) => (
           <div className="sinewave-container">  
             <div className="canvas-wrapper">
               <div className="sine-div" ref={ divRefs.current[index] }></div>
               <div className="read-head"></div>
+              <div className="label">{data.description}</div>
               {/* <div className="lookahead-head"></div> */}
             </div>
+
+            <div className="val">{sinesCurrentVal[index]}</div>
             
-            <Controls
-              id={index} 
-              channels={channels}
-              setChannels={setChannels}
-              isEnabled={isEnabled}
-              setEnabled={setEnabled}
-              mode={mode}
-              setMode={setMode}
-              note={note}
-              setNote={setNote}
-              ccParameter={ccParameter}
-              setCC={setCC}
-              modeRange={modeRange}
-              setModeRange={setModeRange}
-              outputChannel={outputChannel}
-              setOutputChannel={setOutputChannel}
-              collapsed={collapsed}
-              setCollaped={setCollapsed}
-            />
+            <Controls id={index}/>
 
           </div>
         ))
       }
-      {/* <MidiDispatch onMount={onChildMount} /> */}
     </div>
   );
 }

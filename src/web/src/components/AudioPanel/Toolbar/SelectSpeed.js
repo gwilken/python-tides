@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { setSpeed } from '../../../../redux/actions';
+import { setSpeed } from '../../../redux/actions';
 
 
 const SelectSpeed = () => {

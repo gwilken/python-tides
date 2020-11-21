@@ -22,7 +22,7 @@ body {
     align-items: center;
 
     select {
-      max-width: 110px;
+      // max-width: 110px;
       -webkit-appearance: button;
       -moz-appearance: button;
       -webkit-user-select: none;
@@ -53,24 +53,21 @@ body {
 
     input {
       margin-left: 10px;
-      max-width: 110px;
+      // max-width: 110px;
     }
   }
 
   .audio-panel {
     position: absolute;
     margin-left: 8px;
-    // width: 66%; 
-    // pointer-events: none;
-    
+    width: 100%;
+
     .sines-container {
       position: relative;
-      // pointer-events: none;
+      width: 100%;
     }
   }
 
-  
-  
   .fullscreen-container {
     position: relative;
     display: flex;

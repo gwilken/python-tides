@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { setTempo } from '../../../../redux/actions';
+import { setTempo } from '../../../redux/actions';
 
 
 const SelectTempoRange = () => {
