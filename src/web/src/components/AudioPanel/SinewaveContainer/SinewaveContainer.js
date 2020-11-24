@@ -6,7 +6,7 @@ import { normalize } from '../../../scripts/utils';
 import noteScheduler from '../../../scripts/NoteScheduler';
 
 // import MidiDispatch from './MidiDispatch/MidiDispatch';
-
+import BeatIndicator from './BeatIndicator';
 
 import Controls from './Controls/Controls';
 
@@ -22,11 +22,12 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
 
   let sinesDataArr = useRef(sines.map(() => createRef()));
 
-  console.log('sinesDataArr', sinesDataArr)
-
   let sinesCurrentVal = sines.map(() => [])
 
+
   let speed = useSelector(state => state.speed);
+  let ranges = useSelector(state => state.ranges);
+  let notes = useSelector(state => state.notes);
 
   const dispatch = useDispatch();
 
@@ -177,10 +178,27 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
           let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
           let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
 
+          let range = ranges[index];
+          let note = notes[index];
+      
+          let midiValue = note + Math.floor((lookAheadVal * range) / 2)
+
+          
+          // let midiValue = Math.floor(parseFloat(lookAheadVal) * parseInt(range)) + (parseInt(note) - (Math.floor(parseInt(range) / 2)))
+          // let lowRange = note - Math.floor(range / 2);
+          // let highRange = lowRange + note;
+          
+          // let midiValue = parseInt(note) - Math.floor(parseInt(range) / 2) + Math.floor(parseFloat(lookAheadVal * note));
+          
+          
+          // console.log('value', value)
+          let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
+          // let clampedMidiValue = 69;
+
           // 25 = 375px read ahead minus 250px head position
           let scheduleTimeOffset = (speed / 16.6666) * 25;
 
-          // let midiValue = Math.floor(parseFloat(lookAheadVal) * parseInt(modeRange)) + (parseInt(note) - (Math.floor(parseInt(modeRange) / 2)))
+          // let midiValue = Math.floor(parseFloat(lookAheadVal) * parseInt(range)) + (parseInt(note) - (Math.floor(parseInt(range) / 2)))
           // let midiValue = Math.floor(parseFloat(lookAheadVal) * 24) + (63)
           // let clampedMidiValue = Math.min(Math.max(midiValue, 0), 127);
           // let currentLookAheadValue = clampedMidiValue
@@ -195,7 +213,7 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
           
           // every 50ms schedule future notes
           if (elapsed > 50) {
-            noteScheduler.scheduler(lookAheadVal, scheduleTimeOffset, index);
+            noteScheduler.scheduler(clampedMidiValue, scheduleTimeOffset, index);
             then = now
           }
 
@@ -206,7 +224,7 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
     loop();
     
     return () => cancelAnimationFrame(requestId);
-  }, [speed])
+  }, [speed, ranges, notes])
 
 
   let value = null;
@@ -223,10 +241,10 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
               <div className="label">{data.description}</div>
               {/* <div className="lookahead-head"></div> */}
             </div>
-
-            <div className="val">{sinesCurrentVal[index]}</div>
             
-            <Controls id={index}/>
+            <BeatIndicator id={index} />
+
+            <Controls id={index} />
 
           </div>
         ))

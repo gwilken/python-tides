@@ -7,7 +7,7 @@ const SelectRange = ({id}) => {
 
   return (
       <div className="custom-range select-mode-range">
-        <label htmlFor="range-mode">Spread</label>
+        <label htmlFor="range-mode">Notes Spread</label>
         <input 
           name="range-mode"
           type="range"
@@ -17,6 +17,9 @@ const SelectRange = ({id}) => {
           step="1"
           onChange={ (e) => dispatch(setRange({id, range: e.target.value})) }
         />
+        <div>
+          { ranges[id] }
+        </div>
       </div>
     )
   }

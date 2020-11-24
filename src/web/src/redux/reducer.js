@@ -9,19 +9,23 @@ const initialState = {
   channels: [...new Array(8)].map((val, index) => index),
   modes: [...new Array(8)].map(elem => 'NOTE_ON'),
   parameters: [...new Array(8)].map(elem => 0x03),
-  ranges: [...new Array(8)].map(elem => 127),
+  ranges: [...new Array(8)].map(elem => 24),
   notes: [...new Array(8)].map(elem => 69),
   values: [...new Array(8)].map(elem => 0),
-  currentBeats: [...new Array(8)].map(elem => 0)
+  currentBeats: [...new Array(8)].map(elem => 0),
+  enables: [...new Array(8)].map(elem => true),
+  tempos: [...new Array(8)].map(elem => 120)
 };
 
 
 export default function(state = initialState, action) {
   switch (action.type) {
     case 'tempo/set':
+      let newTempos = state.tempos;
+      newTempos[action.payload.id] = action.payload.tempo;
       return {
         ...state,
-        tempo: action.payload.tempo
+        tempos: [...newTempos]
       }
 
     case 'speed/set':

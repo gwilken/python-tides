@@ -9,11 +9,11 @@ const SelectNote = ({id}) => {
   
   return (
     <div className="custom-select  select-note">
-      <label htmlFor="select-note">Center</label>
+      <label htmlFor="select-note">Center Note</label>
       <select 
           name="select-note"
           value={ notes[id] }
-          onChange={ (e) => dispatch(setCenterNote({id, note: e.target.value})) }>
+          onChange={ (e) => dispatch(setCenterNote( {id, note: parseInt(e.target.value)} )) }>
           
           { MIDI_NOTES.map(item => (
             <option 

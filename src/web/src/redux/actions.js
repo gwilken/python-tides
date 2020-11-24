@@ -45,9 +45,10 @@ export const setParameter = ({id, parameter}) => ({
 })
 
 
-export const setTempo = tempo => ({
+export const setTempo = ({id, tempo}) => ({
   type: 'tempo/set',
   payload: {
+    id,
     tempo
   }
 })

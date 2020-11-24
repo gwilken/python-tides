@@ -15,6 +15,10 @@
     background-color: white;
     margin-right: 7px;
     
+    label {
+      display: inline-block;
+      white-space: nowrap;
+    }
   }
   
   .output-container {

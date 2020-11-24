@@ -13,12 +13,12 @@ const SelectDevice = () => {
       <label htmlFor="midi-ouput">device</label>
       <select 
         name="midi-output"
-        value={ selectedDevice ? availableOutputs[selectedDevice].id : "" }
+        value={ selectedDevice }
         onChange={ (e) => dispatch(setSelectedDevice(e.target.value)) }>
 
         { availableOutputs && availableOutputs.map((output, index) => (
           <option 
-            value={ index }
+            value={ output.id }
             key={ output.id }>
                 { output.name }
           </option>))

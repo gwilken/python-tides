@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux';
 
 import SelectMode from './SelectMode';
-import SelectRange from './SelectRange'
-import SelectNote from './SelectNote'
-import SelectCC from './SelectCC'
+import SelectRange from './SelectRange';
+import SelectNote from './SelectNote';
+import SelectCC from './SelectCC';
 import SelectChannel from './SelectChannel';
 
 import './Controls.scss';

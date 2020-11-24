@@ -7,17 +7,17 @@ class NoteScheduler {
     this.state = store.getState();
     
     this.channels = new Array(8).fill(null).map(() => ({
-       nextNoteTime: null, 
-       notesInQueue: [],
-       current16thNote: 0,
-       noteLength: 250,
-       currentVal: 0
+        nextNoteTime: null, 
+        notesInQueue: [],
+        current16thNote: 0,
+        noteLength: 250,
+        currentVal: 0
       })
     )
     this.output = null;
 
-    this.scheduleAheadTime = 500;
-    this.tempo = this.state.tempo;
+    this.scheduleAheadTime = 250;
+    this.tempos = this.state.tempos;
   }
 
 
@@ -25,26 +25,24 @@ class NoteScheduler {
     let state = store.getState();
     let availableDevices = state.availableDevices;
     let selectedDevice = state.selectedDevice;
-    let prevTempo = this.tempo;
-    let newTempo = state.tempo
+    let prevTempos = this.tempos;
+    let newTempos = state.tempos;
 
     if (availableDevices && selectedDevice) {
-      this.output = availableDevices[selectedDevice];
+      this.output = availableDevices.filter(device => device.id === selectedDevice)[0];
     } else {
       this.output = null
     }
 
-    if (prevTempo !== newTempo) {
-      this.tempo = newTempo;
+    if (prevTempos !== newTempos) {
+      this.tempos = newTempos;
     }
   }
 
 
   nextNote(channel) {
-    let secondsPerBeat = 60.0 / this.tempo;
-
+    let secondsPerBeat = 60.0 / this.tempos[channel];
     this.channels[channel].nextNoteTime += 1000 * secondsPerBeat;
-  
     this.channels[channel].current16thNote++;
   
     if ( this.channels[channel].current16thNote == 16) {
@@ -54,24 +52,13 @@ class NoteScheduler {
 
   scheduleNote(note) {
     let { value, timeOffset, channel } = note; 
-
-     this.channels[channel].notesInQueue.push(note);
+    this.channels[channel].notesInQueue.push(note);
   
-
     if (this.output) {
-      let modeRange = 24;
-      let note = 69;
-  
-      let midiValue = Math.floor(parseFloat(value) * parseInt(modeRange)) + (parseInt(note) - (Math.floor(parseInt(modeRange) / 2)))
-      // console.log('value', value)
-      let clampedMidiValue = Math.min(Math.max(midiValue, 0), 127);
-      // let clampedMidiValue = 69;
-  
-      // console.log(clampedMidiValue)
-      var noteOnMessage = [0x90 | channel, clampedMidiValue, 0x7f];    // note on, middle C, full velocity
-  
-      this.output.send( noteOnMessage, window.performance.now() + timeOffset );  //omitting the timestamp means send immediately.
-      this.output.send( [0x80 | channel, clampedMidiValue, 0x40], window.performance.now() + timeOffset + this.channels[channel].noteLength ); // Inlined array creation- note off, middle C,                                                               
+      let noteOnMessage = [0x90 | channel, value, 0x7f]; 
+      let noteOffMessage = [0x80 | channel, value, 0x40];
+      this.output.send( noteOnMessage, window.performance.now() + timeOffset ); 
+      this.output.send( noteOffMessage, window.performance.now() + timeOffset + this.channels[channel].noteLength );                                                              
     }
   }
 
