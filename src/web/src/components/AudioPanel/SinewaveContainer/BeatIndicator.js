@@ -1,10 +1,19 @@
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
 import { normalize } from '../../../scripts/utils'
 import SelectTempo from './SelectTempo';
 
 
-const BeatIndicator = ({id}) => {
-  let currentBeat = useSelector(state => state.currentBeats[id]);
+const BeatIndicator = ({id, onMount}) => {
+  let [currentBeat, setCurrentBeat] = useState({});
+
+  useEffect(() => {
+    onMount([id, setCurrentBeat]);
+  }, [onMount, id]);
+
+  // console.log(currentBeat)
+
+  // let currentBeat = useSelector(state => state.currentBeats[id]);
   let numOfBeats = 16;
   let beatMarkers = [];
 

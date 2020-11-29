@@ -78,19 +78,19 @@ export const setSelectedDevice = id => ({
 })
 
 
-export const toggleGlobalRunning = toggle => ({
-  type: 'run/enabled',
-  payload: {
-    toggle
-  }
-}) 
+// export const toggleGlobalRunning = toggle => ({
+//   type: 'run/enabled',
+//   payload: {
+//     toggle
+//   }
+// }) 
 
 
-export const toggleRunning = ({id, toggle}) => ({
-  type: 'run/enabled',
+export const setEnabled = ({id, enabled}) => ({
+  type: 'enabled/set',
   payload: {
     id,
-    toggle
+    enabled
   }
 }) 
 

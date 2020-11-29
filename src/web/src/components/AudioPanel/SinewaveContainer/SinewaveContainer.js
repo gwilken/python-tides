@@ -1,47 +1,29 @@
 import { useEffect, useRef, createRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setValue, setCurrentBeat } from '../../../redux/actions';
-
+import { useSelector } from 'react-redux';
 import { normalize } from '../../../scripts/utils';
 import noteScheduler from '../../../scripts/NoteScheduler';
 
-// import MidiDispatch from './MidiDispatch/MidiDispatch';
 import BeatIndicator from './BeatIndicator';
-
 import Controls from './Controls/Controls';
 
 import './SinewaveContainer.scss';
 
 
 const SinewaveContainer = ({ sines, globalRun, output }) => {  
-  const prevEnableRef = useRef(true);
   const divRefs = useRef(sines.map(() => createRef()));
-  // keep track of number pattern repeats in canvas. used for animation
   const repeatRefs = useRef(sines.map(() => createRef()));
   const translateXRefs = useRef(sines.map(() => createRef()));
 
   let sinesDataArr = useRef(sines.map(() => createRef()));
-
   let sinesCurrentVal = sines.map(() => [])
-
-
   let speed = useSelector(state => state.speed);
   let ranges = useSelector(state => state.ranges);
   let notes = useSelector(state => state.notes);
-
-  const dispatch = useDispatch();
-
-  let xPercentage = 0;
-
-
-  // useEffect(() => {
-  //   noteScheduler.setOutput(output)
-  // }, [output])
+  let enables = useSelector(state => state.enables);
+  let setBeatValue = {};
 
 
   useEffect(() => {
-    // let metronome = new Worker('/webworkers/metronome-worker.js')
-
     /////// DRAW SETUP START //////////
 
     // save calc in array so we dont recalc every tick to get value
@@ -51,7 +33,7 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
       const canvasContext = canvas.getContext('2d', { alpha: false });
 
       const {amplitude, phase_local, speed} = data;          
-      const height = 75;
+      const height = 95;
 
       let lineWidth = 4
       let lineWidthRatio = lineWidth / height
@@ -123,100 +105,70 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
   }, [])
 
 
-  ////// ANIMATION START //////////
-
   useEffect(() => {
-    let then = 0;
-    let elapsed;
-    let requestId;
-
+    // schedule first note only once
     let start = window.performance.now();
 
     noteScheduler.channels.forEach((channel, index) => {
       noteScheduler.channels[index].nextNoteTime = start;
     })
+  }, [])
 
+
+  ////// ANIMATION START //////////
+  useEffect(() => {
+    let then = window.performance.now();
+    let elapsed;
+    let requestId;
 
     const loop = (now) => {
       requestId = requestAnimationFrame(loop);
-
+      
       if (now === undefined) {
-        now = window.performance.now();
+        now = then;
       }
 
       elapsed = now - then;
       
       sines.forEach((data, index) => {
-        let repeat = repeatRefs.current[index].current;
+        if (enables[index]) {
+          let setBeatIndicator = setBeatValue[index];
+          let repeat = repeatRefs.current[index].current;
+          let xOffset = (now / speed) % (100 / repeat);
+          translateXRefs.current[index].current = xOffset;
+          divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
 
-        let xOffset = (now / speed) % (100 / repeat);
-
-        translateXRefs.current[index].current = xOffset;
-
-        divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
-
-        while (noteScheduler.channels[index].notesInQueue.length && noteScheduler.channels[index].notesInQueue[0].time < now) {
-          // currentNote = notesInQueue[0].note;
-          let currentNote = noteScheduler.channels[index].notesInQueue.splice(0,1);   // remove note from queue
-          dispatch(setCurrentBeat({id: index, beat: currentNote[0] }))
-          // console.log(currentNote[0].beat)
-        }
-
-        let length = sinesDataArr.current[index].current.length;
-
-        let offsetPercent = xOffset * .01;
-
-        if (length) {
-          // gets value at read head. 250 = half of wrapper width
-          let arrIndex = Math.floor((length * offsetPercent) + 250)
-          
-          // wrap around in case we over shoot arr length
-          let val = sinesDataArr.current[index].current[arrIndex % length];
-          
-          sinesCurrentVal[index] = val;
-  
-          let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
-          let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
-
-          let range = ranges[index];
-          let note = notes[index];
-      
-          let midiValue = note + Math.floor((lookAheadVal * range) / 2)
-
-          
-          // let midiValue = Math.floor(parseFloat(lookAheadVal) * parseInt(range)) + (parseInt(note) - (Math.floor(parseInt(range) / 2)))
-          // let lowRange = note - Math.floor(range / 2);
-          // let highRange = lowRange + note;
-          
-          // let midiValue = parseInt(note) - Math.floor(parseInt(range) / 2) + Math.floor(parseFloat(lookAheadVal * note));
-          
-          
-          // console.log('value', value)
-          let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
-          // let clampedMidiValue = 69;
-
-          // 25 = 375px read ahead minus 250px head position
-          let scheduleTimeOffset = (speed / 16.6666) * 25;
-
-          // let midiValue = Math.floor(parseFloat(lookAheadVal) * parseInt(range)) + (parseInt(note) - (Math.floor(parseInt(range) / 2)))
-          // let midiValue = Math.floor(parseFloat(lookAheadVal) * 24) + (63)
-          // let clampedMidiValue = Math.min(Math.max(midiValue, 0), 127);
-          // let currentLookAheadValue = clampedMidiValue
-          // let currentChannel = index;
-          
-          // metronome.onmessage = (e) => {
-            // if (e.data === 'tick') {
-              // console.log('tick', index)
-              // noteScheduler.scheduler(lookAheadVal, scheduleTimeOffset, currentChannel);
-            // }
-          // }
-          
-          // every 50ms schedule future notes
-          if (elapsed > 50) {
-            noteScheduler.scheduler(clampedMidiValue, scheduleTimeOffset, index);
-            then = now
+          while (noteScheduler.channels[index].notesInQueue.length && noteScheduler.channels[index].notesInQueue[0].time < now) {
+            let currentNote = noteScheduler.channels[index].notesInQueue.splice(0,1);   // remove note from queue
+            setTimeout(() => {
+              setBeatIndicator(currentNote[0]);
+            }, 0);
           }
 
+          let length = sinesDataArr.current[index].current.length;
+          let offsetPercent = xOffset * .01;
+
+          if (length) {
+            // gets value at read head. 250 = half of wrapper width
+            let arrIndex = Math.floor((length * offsetPercent) + 250);
+            // wrap around in case we over shoot arr length
+            let val = sinesDataArr.current[index].current[arrIndex % length];
+            sinesCurrentVal[index] = val;
+            let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
+            let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
+            let range = ranges[index];
+            let note = notes[index];
+            let midiValue = note + Math.floor((lookAheadVal * range) / 2)
+            let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
+            // 25 = 375px read ahead minus 250px head position
+            let scheduleTimeOffset = (speed / 16.6666) * 25;
+            
+            // every 50ms schedule future notes
+            if (elapsed > 50) {
+              noteScheduler.scheduler(clampedMidiValue, scheduleTimeOffset, index);
+              then = now
+            }
+          }
         }
       })
     }
@@ -224,11 +176,15 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
     loop();
     
     return () => cancelAnimationFrame(requestId);
-  }, [speed, ranges, notes])
+  }, [speed, ranges, notes, enables])
 
 
-  let value = null;
-  let setValue = null;
+  // pass this child components setValue up to avoid
+  // using redux because of performance issues 
+  const onBeatIndicatorMount = ([id, setValue]) => {
+    setBeatValue[id] = setValue;
+  }
+
 
   return (
     <div className="sines-container">
@@ -239,13 +195,10 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
               <div className="sine-div" ref={ divRefs.current[index] }></div>
               <div className="read-head"></div>
               <div className="label">{data.description}</div>
-              {/* <div className="lookahead-head"></div> */}
             </div>
             
-            <BeatIndicator id={index} />
-
+            <BeatIndicator onMount={onBeatIndicatorMount} id={index} />
             <Controls id={index} />
-
           </div>
         ))
       }

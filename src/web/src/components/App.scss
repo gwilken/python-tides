@@ -1,10 +1,12 @@
 $color-blue: #badefd;
 $color-dark-blue: #0e85ea;
 $color-light-grey: #ececec;
+$color-grey: #d8d8d8;
+
 
 body {
   position: relative;
-  background-color: rgb(216, 216, 216);
+  // background-color: rgb(216, 216, 216);
 
   * {
     box-sizing: border-box;
@@ -22,7 +24,7 @@ body {
     align-items: center;
 
     select {
-      // max-width: 110px;
+      max-width: 170px;
       -webkit-appearance: button;
       -moz-appearance: button;
       -webkit-user-select: none;

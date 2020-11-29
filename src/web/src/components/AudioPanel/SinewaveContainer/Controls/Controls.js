@@ -5,6 +5,7 @@ import SelectRange from './SelectRange';
 import SelectNote from './SelectNote';
 import SelectCC from './SelectCC';
 import SelectChannel from './SelectChannel';
+import ButtonEnable from './ButtonEnable';
 
 import './Controls.scss';
 
@@ -36,27 +37,11 @@ const Controls = ({id}) => {
         </div>
         <div className="output-container">
           <SelectChannel id={id} />
+          <ButtonEnable id={id} />
         </div>
       </div>
 
-      // <div className="side-controls-container">
-      //   <div className="button-enable">
-      //     <svg 
-      //       onClick={ handleEnableClick }>
-      //       <circle 
-      //         className= { props.isEnabled && props.globalRun ? 'enabled' : ''}
-      //         cx="15"
-      //         cy="15"
-      //         r="15"
-      //       />
-
-      //       { props.collapsed &&
-      //         <text x="50%" y="50%" textAnchor="middle" fill="white" dy=".3em">
-      //           { parseInt(props.outputChannel) + 1 }
-      //         </text>
-      //       }
-      //     </svg>
-      //   </div> */}
+   
 
       //   {/* <div className="button-collapse"
       //     onClick={ () => props.setCollapsed(!props.collapsed) }>

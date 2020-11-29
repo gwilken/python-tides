@@ -5,6 +5,7 @@
   justify-content: space-around;
 
   .mode-container {
+    max-width: 300px;
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -32,6 +33,21 @@
     // margin-right: 15px;
     margin-right: 7px;
 
+    .button-enable {
+      cursor: pointer;
+  
+      svg {
+        width: 30px;
+        height: 30px;
+        circle {
+          fill: lightgrey;
+    
+          &.enabled {
+            fill: #75e275;
+          }
+        }
+      }
+    }
   }
 }
 
@@ -40,21 +56,7 @@
   flex-direction: column;
   align-items: center;
 
-  .button-enable {
-    cursor: pointer;
 
-    svg {
-      width: 30px;
-      height: 30px;
-      circle {
-        fill: lightgrey;
-  
-        &.enabled {
-          fill: #75e275;
-        }
-      }
-    }
-  }
 
   .button-collapse {
     position: absolute;

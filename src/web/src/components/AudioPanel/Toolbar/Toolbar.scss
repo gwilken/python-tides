@@ -3,9 +3,10 @@
   pointer-events: all;
   justify-content: space-between;
   padding: 10px 15px;
-  background-color: white;
-  border-radius: 3px;
-  margin-top: 7px;
+  border-radius: 4px;
+  // margin-top: 7px;
+  border-top: 1px solid darkgrey;
+  background-color: #d8d8d8;
 
   .button-global-run {
     cursor: pointer;

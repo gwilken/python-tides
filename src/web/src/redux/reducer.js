@@ -102,6 +102,14 @@ export default function(state = initialState, action) {
         currentBeats: [...newBeats]
       }
   
+    case 'enabled/set':
+      let newEnables = state.enables;
+      newEnables[action.payload.id] = action.payload.enabled;
+      return {
+        ...state,
+        enables: [...newEnables]
+      }
+  
 
     default:
       return state;
