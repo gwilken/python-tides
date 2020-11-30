@@ -41,7 +41,7 @@ const AudioPanel = ({harmonics, selectedStation}) => {
     
     let filtered = harmonics['HarmonicConstituents'].filter(entry => entry['amplitude'] > 0)
 
-    sines = filtered.slice(0, 8)
+    sines = filtered.slice(0, 4)
   }
 
   let output;
@@ -54,15 +54,7 @@ const AudioPanel = ({harmonics, selectedStation}) => {
   return (
     <div className="audio-panel">
       <StationLabel selectedStation={selectedStation} />
-
-      <SinewaveContainer
-        sines={ sines }
-        // globalRun={ globalRun }
-        // globalSpeed={ globalSpeed }
-        // key={ instanceKey }
-        // output={ output}
-      />
-
+      <SinewaveContainer sines={ sines } />
       <Toolbar />
     </div>
   )

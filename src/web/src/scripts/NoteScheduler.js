@@ -16,8 +16,9 @@ class NoteScheduler {
     )
     this.output = null;
 
-    this.scheduleAheadTime = 250;
+    this.scheduleAheadTime = 200;
     this.tempos = this.state.tempos;
+    this.enables = this.state.enables;
   }
 
 
@@ -37,6 +38,10 @@ class NoteScheduler {
     if (prevTempos !== newTempos) {
       this.tempos = newTempos;
     }
+
+    if (this.enables !== state.enables) {
+      this.enables = state.enables;
+    }
   }
 
 
@@ -54,7 +59,7 @@ class NoteScheduler {
     let { value, timeOffset, channel } = note; 
     this.channels[channel].notesInQueue.push(note);
   
-    if (this.output) {
+    if (this.output && this.enables[channel]) {
       let noteOnMessage = [0x90 | channel, value, 0x7f]; 
       let noteOffMessage = [0x80 | channel, value, 0x40];
       this.output.send( noteOnMessage, window.performance.now() + timeOffset ); 
@@ -63,7 +68,10 @@ class NoteScheduler {
   }
 
   scheduler(value, timeOffset, channel) {
-    while ( this.channels[channel].nextNoteTime < window.performance.now() + this.scheduleAheadTime ) {
+    while (this.channels[channel].nextNoteTime < (window.performance.now() + this.scheduleAheadTime)) {
+      
+      console.log('sched.', this.channels[channel].notesInQueue)
+      
         this.scheduleNote({
           beat: this.channels[channel].current16thNote,
           time: this.channels[channel].nextNoteTime,

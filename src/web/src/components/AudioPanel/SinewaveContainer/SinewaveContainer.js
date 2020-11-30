@@ -9,7 +9,7 @@ import Controls from './Controls/Controls';
 import './SinewaveContainer.scss';
 
 
-const SinewaveContainer = ({ sines, globalRun, output }) => {  
+const SinewaveContainer = ({ sines }) => {  
   const divRefs = useRef(sines.map(() => createRef()));
   const repeatRefs = useRef(sines.map(() => createRef()));
   const translateXRefs = useRef(sines.map(() => createRef()));
@@ -131,12 +131,36 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
       elapsed = now - then;
       
       sines.forEach((data, index) => {
-        if (enables[index]) {
-          let setBeatIndicator = setBeatValue[index];
-          let repeat = repeatRefs.current[index].current;
-          let xOffset = (now / speed) % (100 / repeat);
-          translateXRefs.current[index].current = xOffset;
-          divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
+        let setBeatIndicator = setBeatValue[index];
+        let repeat = repeatRefs.current[index].current;
+        let xOffset = (now / speed) % (100 / repeat);
+        translateXRefs.current[index].current = xOffset;
+        divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
+
+        let length = sinesDataArr.current[index].current.length;
+        let offsetPercent = xOffset * .01;
+
+        if (length) {
+          // gets value at read head. 250 = half of wrapper width
+          // TODO: remove hard coded value
+          let arrIndex = Math.floor((length * offsetPercent) + 250);
+          // wrap around in case we over shoot arr length
+          let val = sinesDataArr.current[index].current[arrIndex % length];
+          sinesCurrentVal[index] = val;
+          let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
+          let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
+          let range = ranges[index];
+          let note = notes[index];
+          let midiValue = note + Math.floor((lookAheadVal * range) / 2)
+          let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
+          // 25 = 375px read ahead minus 250px head position
+          let scheduleTimeOffset = (speed / 16.6666) * 25;
+          
+          // every 50ms schedule future notes
+          if (elapsed > 50) {
+            noteScheduler.scheduler(clampedMidiValue, scheduleTimeOffset, index);
+            then = now
+          }
 
           while (noteScheduler.channels[index].notesInQueue.length && noteScheduler.channels[index].notesInQueue[0].time < now) {
             let currentNote = noteScheduler.channels[index].notesInQueue.splice(0,1);   // remove note from queue
@@ -144,39 +168,23 @@ const SinewaveContainer = ({ sines, globalRun, output }) => {
               setBeatIndicator(currentNote[0]);
             }, 0);
           }
+        }
 
-          let length = sinesDataArr.current[index].current.length;
-          let offsetPercent = xOffset * .01;
-
-          if (length) {
-            // gets value at read head. 250 = half of wrapper width
-            let arrIndex = Math.floor((length * offsetPercent) + 250);
-            // wrap around in case we over shoot arr length
-            let val = sinesDataArr.current[index].current[arrIndex % length];
-            sinesCurrentVal[index] = val;
-            let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
-            let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
-            let range = ranges[index];
-            let note = notes[index];
-            let midiValue = note + Math.floor((lookAheadVal * range) / 2)
-            let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
-            // 25 = 375px read ahead minus 250px head position
-            let scheduleTimeOffset = (speed / 16.6666) * 25;
-            
-            // every 50ms schedule future notes
-            if (elapsed > 50) {
-              noteScheduler.scheduler(clampedMidiValue, scheduleTimeOffset, index);
-              then = now
-            }
-          }
+        // set disabled visual style
+        if (!enables[index]) {
+          divRefs.current[index].current.style.filter = 'grayscale(1)';
+        } else {
+          divRefs.current[index].current.style.filter = '';
         }
       })
     }
     
     loop();
     
-    return () => cancelAnimationFrame(requestId);
-  }, [speed, ranges, notes, enables])
+    return () => {
+        cancelAnimationFrame(requestId);
+      }
+    }, [speed, ranges, notes, enables])
 
 
   // pass this child components setValue up to avoid

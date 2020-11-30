@@ -17,7 +17,7 @@ const SelectRange = ({id}) => {
           step="1"
           onChange={ (e) => dispatch(setRange({id, range: e.target.value})) }
         />
-        <div>
+        <div className="range-label">
           { ranges[id] }
         </div>
       </div>
