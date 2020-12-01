@@ -5,7 +5,7 @@ class NoteScheduler {
     store.subscribe(this.storeUpdated);
 
     this.state = store.getState();
-    
+
     this.channels = new Array(8).fill(null).map(() => ({
         nextNoteTime: null, 
         notesInQueue: [],
@@ -16,7 +16,7 @@ class NoteScheduler {
     )
     this.output = null;
 
-    this.scheduleAheadTime = 200;
+    this.scheduleAheadTime = 750;
     this.tempos = this.state.tempos;
     this.enables = this.state.enables;
   }
@@ -58,7 +58,7 @@ class NoteScheduler {
   scheduleNote(note) {
     let { value, timeOffset, channel } = note; 
     this.channels[channel].notesInQueue.push(note);
-  
+
     if (this.output && this.enables[channel]) {
       let noteOnMessage = [0x90 | channel, value, 0x7f]; 
       let noteOffMessage = [0x80 | channel, value, 0x40];
