@@ -1,6 +1,7 @@
 
 import SelectSpeed from './SelectSpeed'
 import SelectDevice from './SelectDevice'
+import SelectTempo from './SelectTempo'
 
 import './Toolbar.scss'
 
@@ -14,7 +15,8 @@ const Toolbar = () => {
     <div className="toolbar">
       <SelectSpeed />
       <SelectDevice />
-
+      <SelectTempo />
+      
       {/* <div onClick={ () => setGlobalRun(!globalRun)}>
         { globalRun ? 'all stop' : 'run' }
       </div> */}

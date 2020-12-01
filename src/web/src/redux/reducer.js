@@ -14,18 +14,24 @@ const initialState = {
   values: [...new Array(8)].map(elem => 0),
   currentBeats: [...new Array(8)].map(elem => 0),
   enables: [...new Array(8)].map(elem => true),
-  tempos: [...new Array(8)].map(elem => 120)
+  beatSelections: [...new Array(8)].map(elem => [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false])
+  // tempos: [...new Array(8)].map(elem => 120)
 };
 
 
 export default function(state = initialState, action) {
   switch (action.type) {
+    // case 'tempo/set':
+    //   let newTempos = state.tempos;
+    //   newTempos[action.payload.id] = action.payload.tempo;
+    //   return {
+    //     ...state,
+    //     tempos: [...newTempos]
+    //   }
     case 'tempo/set':
-      let newTempos = state.tempos;
-      newTempos[action.payload.id] = action.payload.tempo;
       return {
         ...state,
-        tempos: [...newTempos]
+        tempo: action.payload.tempo
       }
 
     case 'speed/set':
@@ -108,6 +114,14 @@ export default function(state = initialState, action) {
       return {
         ...state,
         enables: [...newEnables]
+      }
+
+    case 'beatSelections/set':
+      let newBeatSelections = state.beatSelections;
+      newBeatSelections[action.payload.id] = action.payload.beats;
+      return {
+        ...state,
+        enables: [...newBeatSelections]
       }
   
 

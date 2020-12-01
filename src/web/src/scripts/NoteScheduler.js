@@ -3,22 +3,18 @@ import store from '../redux/store';
 class NoteScheduler {
   constructor() {
     store.subscribe(this.storeUpdated);
-
     this.state = store.getState();
-
-    this.channels = new Array(8).fill(null).map(() => ({
-        nextNoteTime: null, 
-        notesInQueue: [],
-        current16thNote: 0,
-        noteLength: 250,
-        currentVal: 0
-      })
-    )
+    this.nextNoteTime = null; 
+    this.notesInQueue = [];
+    this.current16thNote = 0;
+    this.noteLength = 125;
+    this.currentVal = 0;
     this.output = null;
-
-    this.scheduleAheadTime = 750;
-    this.tempos = this.state.tempos;
+    this.scheduleAheadTime = 100;
+    this.tempo = this.state.tempo;
     this.enables = this.state.enables;
+    this.lastNoteTimeStamp = null;
+    this.beatSelections = this.state.beatSelections;
   }
 
 
@@ -26,8 +22,6 @@ class NoteScheduler {
     let state = store.getState();
     let availableDevices = state.availableDevices;
     let selectedDevice = state.selectedDevice;
-    let prevTempos = this.tempos;
-    let newTempos = state.tempos;
 
     if (availableDevices && selectedDevice) {
       this.output = availableDevices.filter(device => device.id === selectedDevice)[0];
@@ -35,52 +29,61 @@ class NoteScheduler {
       this.output = null
     }
 
-    if (prevTempos !== newTempos) {
-      this.tempos = newTempos;
+    if (this.tempo !== state.tempo) {
+      this.tempo = state.tempo;
     }
 
     if (this.enables !== state.enables) {
       this.enables = state.enables;
     }
+    
+    if (this.beatSelections !== state.beatSelections) {
+      this.beatSelections = state.beatSelections;
+    }
   }
 
 
-  nextNote(channel) {
-    let secondsPerBeat = 60.0 / this.tempos[channel];
-    this.channels[channel].nextNoteTime += 1000 * secondsPerBeat;
-    this.channels[channel].current16thNote++;
-  
-    if ( this.channels[channel].current16thNote == 16) {
-      this.channels[channel].current16thNote = 0;
+  nextNote() {
+    let secondsPerBeat = 60.0 / this.tempo;
+    this.nextNoteTime += 1000 * secondsPerBeat;
+    this.current16thNote++;
+    if (this.current16thNote == 16) {
+      this.current16thNote = 0;
     }
   }
 
   scheduleNote(note) {
-    let { value, timeOffset, channel } = note; 
-    this.channels[channel].notesInQueue.push(note);
+    let { beat, time, value, channel } = note; 
 
-    if (this.output && this.enables[channel]) {
+    this.notesInQueue.push(note);
+
+    if (
+      this.output && 
+      this.enables[channel] &&
+      this.beatSelections[channel][beat] ) {
+
       let noteOnMessage = [0x90 | channel, value, 0x7f]; 
       let noteOffMessage = [0x80 | channel, value, 0x40];
-      this.output.send( noteOnMessage, window.performance.now() + timeOffset ); 
-      this.output.send( noteOffMessage, window.performance.now() + timeOffset + this.channels[channel].noteLength );                                                              
+      this.output.send( noteOnMessage, time ); 
+      this.output.send( noteOffMessage, time + this.noteLength );                                                              
     }
   }
 
-  scheduler(value, timeOffset, channel) {
-    while (this.channels[channel].nextNoteTime < (window.performance.now() + this.scheduleAheadTime)) {
-      
-      console.log('sched.', this.channels[channel].notesInQueue)
-      
+
+  scheduler(notes) {
+    while (this.nextNoteTime < (window.performance.now() + this.scheduleAheadTime)) {
+      notes.forEach(note => {
+        let [value, channel] = note;
+
         this.scheduleNote({
-          beat: this.channels[channel].current16thNote,
-          time: this.channels[channel].nextNoteTime,
+          beat: this.current16thNote,
+          time: this.nextNoteTime,
           value,
-          timeOffset,
           channel 
         });
-        
-        this.nextNote(channel);
+      })
+
+      this.nextNote();
     }
   }
 }

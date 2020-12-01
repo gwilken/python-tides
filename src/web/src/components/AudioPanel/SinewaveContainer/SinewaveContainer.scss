@@ -61,7 +61,7 @@
   .beat-indicator {
     display: flex;
     flex-direction: column;
-    width: 200px;
+    width: 300px;
     margin-right: 7px;
     // height: 100%;
 
@@ -86,18 +86,18 @@
       }
     }
 
-    .select-tempo-range {
+    .pattern-select {
       margin-top: 7px;
       background-color: white;
       border-radius: 3px;
-      padding: 8px 5px;
-      justify-content: space-evenly;
+      padding: 4px 0px;
+      justify-content: flex-end;
 
-      .tempo-display {
-        font-size: 13px;
-        font-family: sans-serif;
-        white-space: nowrap;
-      }
+      // .patt-display {
+      //   font-size: 13px;
+      //   font-family: sans-serif;
+      //   white-space: nowrap;
+      // }
     }
   }
 

@@ -45,10 +45,18 @@ export const setParameter = ({id, parameter}) => ({
 })
 
 
-export const setTempo = ({id, tempo}) => ({
+// export const setTempo = ({id, tempo}) => ({
+//   type: 'tempo/set',
+//   payload: {
+//     id,
+//     tempo
+//   }
+// })
+
+
+export const setTempo = ({tempo}) => ({
   type: 'tempo/set',
   payload: {
-    id,
     tempo
   }
 })
@@ -125,6 +133,15 @@ export const setCurrentBeat = ({id, beat}) => ({
   payload: {
     id,
     beat
+  }
+}) 
+
+
+export const setBeatSelections = ({id, beats}) => ({
+  type: 'beatSelections/set',
+  payload: {
+    id,
+    beats
   }
 }) 
 

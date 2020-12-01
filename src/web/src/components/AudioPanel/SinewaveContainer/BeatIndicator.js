@@ -1,13 +1,16 @@
-// import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { setBeatSelections } from '../../../redux/actions';
 import { normalize } from '../../../scripts/utils'
-import SelectTempo from './SelectTempo';
+import SelectBeatPattern from './SelectBeatPattern';
 
 
 const BeatIndicator = ({id, onMount}) => {
   let [currentBeat, setCurrentBeat] = useState({});
   let enables = useSelector(state => state.enables);
+  let beatSelections = useSelector(state => state.beatSelections[id]);
+
+  let dispatch = useDispatch();
 
   useEffect(() => {
     onMount([id, setCurrentBeat]);
@@ -19,16 +22,26 @@ const BeatIndicator = ({id, onMount}) => {
   let numOfBeats = 16;
   let beatMarkers = [];
 
-  let height = normalize(currentBeat.value, 127, 20) * 100;
+  let height = normalize(currentBeat.value, 127, 30) * 100;
+
+
+  function toggleSelection(index) {
+    let newSelections = beatSelections;
+    newSelections[index] = !newSelections[index];
+    dispatch(setBeatSelections({id, beats: newSelections }))
+  }
+
 
   for (let i = 0; i < numOfBeats; i++) {
     beatMarkers.push(
-      <div className="beat-marker-container">
-        <div 
-          className={`beat-marker ${i == currentBeat.beat ? "active" : ''}`}
+      <div className="beat-marker-container"
+        style={{ 'background-color': beatSelections[i] ? '#f7d28f' : 'white' }}
+        onClick={ () => toggleSelection(i) }>
+
+        <div className={`beat-marker ${i == currentBeat.beat ? "active" : ''}`}
           style={{ 
             'height': height + '%',
-            'filter': enables[id] ? '' : 'grayscale(1)'}} >
+            'filter': enables[id] ? '' : 'grayscale(1)'}}>
           </div>
       </div>
     )
@@ -41,7 +54,7 @@ const BeatIndicator = ({id, onMount}) => {
         { beatMarkers }
       </div>
 
-      <SelectTempo id={id} />
+      <SelectBeatPattern id={id} />
     </div>
   )
 }

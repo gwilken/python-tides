@@ -13,10 +13,10 @@ const SelectTempoRange = () => {
         name="range-tempo"
         type="range"
         min="1"
-        max="480"
+        max="720"
         value={tempo}
-        step="1"
-        onChange={ (e) => dispatch(setTempo(e.target.value)) }
+        step="10"
+        onChange={ (e) => dispatch(setTempo({tempo: e.target.value})) }
       />
     </div>
   )

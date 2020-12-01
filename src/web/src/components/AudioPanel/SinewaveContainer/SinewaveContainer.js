@@ -21,7 +21,7 @@ const SinewaveContainer = ({ sines }) => {
   let notes = useSelector(state => state.notes);
   let enables = useSelector(state => state.enables);
   let setBeatValue = {};
-
+  // let isVisible = true;
 
   useEffect(() => {
     /////// DRAW SETUP START //////////
@@ -108,11 +108,19 @@ const SinewaveContainer = ({ sines }) => {
   useEffect(() => {
     // schedule first note only once
     let start = window.performance.now();
-
-    noteScheduler.channels.forEach((channel, index) => {
-      noteScheduler.channels[index].nextNoteTime = start;
-    })
+    noteScheduler.nextNoteTime = start;
   }, [])
+
+  // let setBeatIndicator = setBeatValue;
+
+
+  // document.addEventListener('visibilitychange', () => {
+  //   if (document.visibilityState === 'visible') {
+  //     isVisible = true;
+  //   } else {
+  //     isVisible = false;
+  //   }  
+  // })
 
 
   ////// ANIMATION START //////////
@@ -129,9 +137,10 @@ const SinewaveContainer = ({ sines }) => {
       }
 
       elapsed = now - then;
-      
+
+      let sendNotes = [];
+
       sines.forEach((data, index) => {
-        let setBeatIndicator = setBeatValue[index];
         let repeat = repeatRefs.current[index].current;
         let xOffset = (now / speed) % (100 / repeat);
         translateXRefs.current[index].current = xOffset;
@@ -146,28 +155,33 @@ const SinewaveContainer = ({ sines }) => {
           let arrIndex = Math.floor((length * offsetPercent) + 250);
           // wrap around in case we over shoot arr length
           let val = sinesDataArr.current[index].current[arrIndex % length];
+          
           sinesCurrentVal[index] = val;
-          let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
-          let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
+
+          // let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
+          // let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
+          
           let range = ranges[index];
           let note = notes[index];
-          let midiValue = note + Math.floor((lookAheadVal * range) / 2)
+          
+          // let midiValue = note + Math.floor((lookAheadVal * range) / 2)
+          // let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
+          
+          let midiValue = note + Math.floor((val * range) / 2)
           let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
+
           // 25 = 375px read ahead minus 250px head position
-          let scheduleTimeOffset = (speed / 16.6666) * 25;
+          // let scheduleTimeOffset = (speed / 16.6666) * 25;
           
           // every 50ms schedule future notes
-          if (elapsed > 50) {
-            noteScheduler.scheduler(clampedMidiValue, scheduleTimeOffset, index);
+          // index is == to channel
+          // if (elapsed > 50) {
+            // console.log('schedule for:', clampedMidiValue, index)
+            sendNotes.push([clampedMidiValue, index]);
+            // noteScheduler.scheduler(clampedMidiValue, scheduleTimeOffset, index);
             then = now
-          }
 
-          while (noteScheduler.channels[index].notesInQueue.length && noteScheduler.channels[index].notesInQueue[0].time < now) {
-            let currentNote = noteScheduler.channels[index].notesInQueue.splice(0,1);   // remove note from queue
-            setTimeout(() => {
-              setBeatIndicator(currentNote[0]);
-            }, 0);
-          }
+          // }
         }
 
         // set disabled visual style
@@ -177,6 +191,21 @@ const SinewaveContainer = ({ sines }) => {
           divRefs.current[index].current.style.filter = '';
         }
       })
+
+      // if (dateElapsed < 30) {
+        noteScheduler.scheduler(sendNotes);
+
+        while (noteScheduler.notesInQueue.length && noteScheduler.notesInQueue[0].time < now) {
+          let currentNote = noteScheduler.notesInQueue.splice(0,1);   // remove note from queue
+          // console.log(currentNote)
+          let { channel } = currentNote[0];
+
+          setTimeout(() => {
+            setBeatValue[channel](currentNote[0]);
+          }, 0);
+        }
+      // }
+
     }
     
     loop();
@@ -206,6 +235,7 @@ const SinewaveContainer = ({ sines }) => {
             </div>
             
             <BeatIndicator onMount={onBeatIndicatorMount} id={index} />
+
             <Controls id={index} />
           </div>
         ))
