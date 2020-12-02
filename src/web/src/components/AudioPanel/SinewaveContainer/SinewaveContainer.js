@@ -9,31 +9,39 @@ import Controls from './Controls/Controls';
 import './SinewaveContainer.scss';
 
 
-const SinewaveContainer = ({ sines }) => {  
+const SinewaveContainer = ({ sines }) => {
+  const wrapperRefs = useRef(sines.map(() => createRef()));
   const divRefs = useRef(sines.map(() => createRef()));
   const repeatRefs = useRef(sines.map(() => createRef()));
   const translateXRefs = useRef(sines.map(() => createRef()));
+  const sinesDataArr = useRef(sines.map(() => createRef()));
 
-  let sinesDataArr = useRef(sines.map(() => createRef()));
-  let sinesCurrentVal = sines.map(() => [])
+  let windowSize = useSelector(state => state.windowSize);
   let speed = useSelector(state => state.speed);
   let ranges = useSelector(state => state.ranges);
   let notes = useSelector(state => state.notes);
   let enables = useSelector(state => state.enables);
+
+  let sinesCurrentVal = sines.map(() => [])
   let setBeatValue = {};
-  // let isVisible = true;
+
 
   useEffect(() => {
+    console.log('DRAWWWW')
     /////// DRAW SETUP START //////////
 
     // save calc in array so we dont recalc every tick to get value
     // we'll use css tranform translateX instead of redrawing every frame for performance
     sines.forEach((data, index) => {
+      const wrapper = wrapperRefs.current[index].current;
+      const computedHeight = window.getComputedStyle(wrapper).getPropertyValue('height').slice(0, -2);
+      const computedWidth = window.getComputedStyle(wrapper).getPropertyValue('width').slice(0, -2);
+
       const canvas = document.createElement('canvas');
       const canvasContext = canvas.getContext('2d', { alpha: false });
 
       const {amplitude, phase_local, speed} = data;          
-      const height = 95;
+      const height = computedHeight;
 
       let lineWidth = 4
       let lineWidthRatio = lineWidth / height
@@ -54,9 +62,9 @@ const SinewaveContainer = ({ sines }) => {
       
       let tempWidth = tempDataArr.length;
 
-      // we want width of final div to be at least 1500px (triple the wrapper div's 500px)
+      // we want width of final div to be at least triple the wrapper div's width
       // and repeat pattern without getting cutting off
-      let canvasWidth = 1500 + (tempWidth - (((1500 / tempWidth) % 1) * tempWidth));
+      let canvasWidth = (computedWidth * 3) + (tempWidth - ((((computedWidth * 3) / tempWidth) % 1) * tempWidth));
       canvas.width = canvasWidth
 
       // save num of repeats. will need for animation later.
@@ -102,7 +110,7 @@ const SinewaveContainer = ({ sines }) => {
       divRefs.current[index].current.style.backgroundImage = `url(${image})`;
       divRefs.current[index].current.style.width = `${canvasWidth}px`;
     })
-  }, [])
+  }, [windowSize])
 
 
   useEffect(() => {
@@ -125,6 +133,7 @@ const SinewaveContainer = ({ sines }) => {
 
   ////// ANIMATION START //////////
   useEffect(() => {
+    console.log('ANIMATION>>>>>')
     let then = window.performance.now();
     let elapsed;
     let requestId;
@@ -192,19 +201,16 @@ const SinewaveContainer = ({ sines }) => {
         }
       })
 
-      // if (dateElapsed < 30) {
         noteScheduler.scheduler(sendNotes);
 
         while (noteScheduler.notesInQueue.length && noteScheduler.notesInQueue[0].time < now) {
           let currentNote = noteScheduler.notesInQueue.splice(0,1);   // remove note from queue
-          // console.log(currentNote)
-          let { channel } = currentNote[0];
+          let { index } = currentNote[0];
 
           setTimeout(() => {
-            setBeatValue[channel](currentNote[0]);
+            setBeatValue[index](currentNote[0]);
           }, 0);
         }
-      // }
 
     }
     
@@ -213,11 +219,11 @@ const SinewaveContainer = ({ sines }) => {
     return () => {
         cancelAnimationFrame(requestId);
       }
-    }, [speed, ranges, notes, enables])
+    }, [speed, ranges, notes, enables, windowSize])
 
 
   // pass this child components setValue up to avoid
-  // using redux because of performance issues 
+  // using redux dispatch because of performance issues 
   const onBeatIndicatorMount = ([id, setValue]) => {
     setBeatValue[id] = setValue;
   }
@@ -227,8 +233,8 @@ const SinewaveContainer = ({ sines }) => {
     <div className="sines-container">
       {
         sines.map((data, index) => (
-          <div className="sinewave-container">  
-            <div className="canvas-wrapper">
+          <div className="sinewave-container">
+            <div className="canvas-wrapper" ref={ wrapperRefs.current[index] }>
               <div className="sine-div" ref={ divRefs.current[index] }></div>
               <div className="read-head"></div>
               <div className="label">{data.description}</div>

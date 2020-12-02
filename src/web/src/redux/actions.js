@@ -1,5 +1,13 @@
 
 
+export const setWindowSize = ({size}) => ({
+  type: 'window/set',
+  payload: {
+    size
+  }
+})
+
+
 export const setChannel = ({id, channel}) => ({
   type: 'channel/set',
   payload: {

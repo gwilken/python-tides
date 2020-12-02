@@ -8,7 +8,7 @@ const SelectSpeed = () => {
 
   return (
     <div className="global-range custom-range">
-      <label htmlFor="global-speed">speed</label>
+      <label htmlFor="global-speed">Speed</label>
       <input 
         name="global-speed"
         type="range"

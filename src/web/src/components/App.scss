@@ -60,6 +60,7 @@ body {
 
     .range-label {
       font-size: 13px;
+      color: dimgrey;
       font-family: sans-serif;
       white-space: nowrap;
     }
@@ -67,7 +68,6 @@ body {
 
   .audio-panel {
     position: absolute;
-    margin-left: 8px;
     width: 100%;
 
     .sines-container {

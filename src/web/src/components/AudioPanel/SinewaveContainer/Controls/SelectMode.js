@@ -9,7 +9,7 @@ const SelectMode = ({id}) => {
 
   return (
     <div className="custom-select ">
-      <label htmlFor="mode-select">Output</label>
+      <label htmlFor="mode-select">Output Mode</label>
       <select
         name="mode-select"
         value={ modes[id] }

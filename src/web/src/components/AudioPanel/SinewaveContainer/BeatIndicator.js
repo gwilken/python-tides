@@ -34,14 +34,15 @@ const BeatIndicator = ({id, onMount}) => {
 
   for (let i = 0; i < numOfBeats; i++) {
     beatMarkers.push(
-      <div className="beat-marker-container"
-        style={{ 'background-color': beatSelections[i] ? '#f7d28f' : 'white' }}
+      <div className={
+          `beat-marker-container 
+          ${beatSelections[i] ? 'selected' : ''}
+          ${enables[id] ? '' : 'disabled'}`
+        }
         onClick={ () => toggleSelection(i) }>
 
         <div className={`beat-marker ${i == currentBeat.beat ? "active" : ''}`}
-          style={{ 
-            'height': height + '%',
-            'filter': enables[id] ? '' : 'grayscale(1)'}}>
+          style={{ 'height': height + '%' }} >
           </div>
       </div>
     )

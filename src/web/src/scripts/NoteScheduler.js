@@ -7,7 +7,7 @@ class NoteScheduler {
     this.nextNoteTime = null; 
     this.notesInQueue = [];
     this.current16thNote = 0;
-    this.noteLength = 125;
+    this.noteLength = 1000 / (this.state.tempo / 60);
     this.currentVal = 0;
     this.output = null;
     this.scheduleAheadTime = 100;
@@ -15,6 +15,7 @@ class NoteScheduler {
     this.enables = this.state.enables;
     this.lastNoteTimeStamp = null;
     this.beatSelections = this.state.beatSelections;
+    this.channels = this.state.channels;
   }
 
 
@@ -40,6 +41,10 @@ class NoteScheduler {
     if (this.beatSelections !== state.beatSelections) {
       this.beatSelections = state.beatSelections;
     }
+
+    if (this.channels !== state.channels) {
+      this.channels = state.channels;
+    }
   }
 
 
@@ -53,14 +58,15 @@ class NoteScheduler {
   }
 
   scheduleNote(note) {
-    let { beat, time, value, channel } = note; 
+    let { beat, time, value, index } = note; 
+    let channel = this.channels[index];
 
     this.notesInQueue.push(note);
 
     if (
       this.output && 
-      this.enables[channel] &&
-      this.beatSelections[channel][beat] ) {
+      this.enables[index] &&
+      this.beatSelections[index][beat] ) {
 
       let noteOnMessage = [0x90 | channel, value, 0x7f]; 
       let noteOffMessage = [0x80 | channel, value, 0x40];
@@ -73,13 +79,13 @@ class NoteScheduler {
   scheduler(notes) {
     while (this.nextNoteTime < (window.performance.now() + this.scheduleAheadTime)) {
       notes.forEach(note => {
-        let [value, channel] = note;
+        let [value, index] = note;
 
         this.scheduleNote({
           beat: this.current16thNote,
           time: this.nextNoteTime,
           value,
-          channel 
+          index 
         });
       })
 

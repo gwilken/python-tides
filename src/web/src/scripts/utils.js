@@ -48,5 +48,18 @@ const rotateArrRight = (arr, num) => {
 }
 
 
-export { getPixelRatio, normalize, range, rotateArrLeft, rotateArrRight }
+const debounce = (callback) => {
+  let timer;
+
+  return function(event) {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    
+    timer = setTimeout(callback, 250, event);
+  };
+}
+
+
+export { getPixelRatio, normalize, range, rotateArrLeft, rotateArrRight, debounce }
 

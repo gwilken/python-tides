@@ -36,8 +36,8 @@ const Controls = ({id}) => {
           <SelectRange id={id}/>
         </div>
         <div className="output-container">
-          <SelectChannel id={id} />
           <ButtonEnable id={id} />
+          <SelectChannel id={id} />
         </div>
       </div>
 

@@ -18,12 +18,12 @@ const SelectChannel = ({ id }) => {
 
  
   return (
-    <div className="custom-select ">
+    <div className="custom-select channel-select">
       <label htmlFor="channel-output">channel</label>
       <select 
         name="channel-output"
         value={ channels[id] }
-        onChange={ (e) => dispatch(setChannel( {id, channel: e.target.value} )) }>
+        onChange={ (e) => dispatch(setChannel( {id, channel: parseInt(e.target.value)} )) }>
         {
           createOptions()
         }

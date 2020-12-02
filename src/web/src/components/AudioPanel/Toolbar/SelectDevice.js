@@ -10,7 +10,7 @@ const SelectDevice = () => {
 
   return (
     <div className="custom-select ">
-      <label htmlFor="midi-output">device</label>
+      <label htmlFor="midi-output">Output Device</label>
       <select 
         name="midi-output"
         value={ selectedDevice }

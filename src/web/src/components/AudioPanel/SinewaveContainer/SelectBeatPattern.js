@@ -1,24 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBeatSelections } from '../../../redux/actions';
+import patterns from '../../../constants/beat-patterns';
 // import { isEqual } from 'lodash-es';
 
 const SelectBeatPattern = ({id}) => {
-  let [value, setValue] = useState();
+  let [value, setValue] = useState(2);
   let beatSelections = useSelector(state => state.beatSelections[id]);
   let dispatch = useDispatch();
-
-  const patterns = [
-    {
-      label: 'every 4th',
-      pattern: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false]
-    },
-    {
-      label: 'every 16th',
-      pattern: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
-    }
-  ]
-
 
   // useEffect(() => {
   //   let patternIndex = patterns.findIndex(elem => {
@@ -33,12 +22,8 @@ const SelectBeatPattern = ({id}) => {
 
 
   function handleSelection(index) {
-    if (index == 'user') {
-      setValue('user')
-    } else {
       dispatch(setBeatSelections({id, beats: patterns[index].pattern} ));
-      setValue(index);
-    }
+      setValue(index)
 
     // let patternIndex = patterns.findIndex(elem => {
     //   console.log(isEqual(elem.pattern, beatSelections))
@@ -50,7 +35,7 @@ const SelectBeatPattern = ({id}) => {
 
   return (
     <div className="custom-select pattern-select">
-      <label htmlFor="beat-select">pattern</label>
+      <label htmlFor="beat-select">Pattern</label>
       <select 
         name="beat-select"
         value={ value }
@@ -63,11 +48,6 @@ const SelectBeatPattern = ({id}) => {
                 { pattern.label }
           </option>))
         }
-
-        <option
-          value="user">
-            user defined
-        </option>
       </select>
     </div>
   )
