@@ -15,7 +15,7 @@ const SelectMode = ({id}) => {
         value={ modes[id] }
         onChange={ (e) => dispatch(setMode({id, mode: e.target.value})) }>
         {
-          MODES.map(({id, displayName}) => (
+          MODES.map(({id, displayName, value}) => (
             <option 
               value={ id }
               key={ id }>

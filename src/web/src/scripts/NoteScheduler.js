@@ -1,4 +1,5 @@
 import store from '../redux/store';
+import { MODES } from '../constants/midi-modes'
 
 class NoteScheduler {
   constructor() {
@@ -16,6 +17,8 @@ class NoteScheduler {
     this.lastNoteTimeStamp = null;
     this.beatSelections = this.state.beatSelections;
     this.channels = this.state.channels;
+    this.modes = this.state.modes;
+    this.parameters = this.state.parameters;
   }
 
 
@@ -45,6 +48,14 @@ class NoteScheduler {
     if (this.channels !== state.channels) {
       this.channels = state.channels;
     }
+
+    if (this.modes !== state.modes) {
+      this.modes = state.modes;
+    }
+
+    if (this.parameters !== state.parameters) {
+      this.parameters = state.parameters;
+    }
   }
 
 
@@ -67,11 +78,17 @@ class NoteScheduler {
       this.output && 
       this.enables[index] &&
       this.beatSelections[index][beat] ) {
+    
+      if (this.modes[index] === 'NOTE_ON') {
+        let onMessage = [0x90 | channel, value, 0x7f]; 
+        this.output.send( onMessage, time ); 
+        let offMessage = [0x80 | channel, value, 0x40];
+        this.output.send( offMessage, time + this.noteLength );                                                              
+      } else if (this.modes[index] === 'CC') {
+        this.output.send( [0xB0 | channel, this.parameters[index], value], time); 
+      }
 
-      let noteOnMessage = [0x90 | channel, value, 0x7f]; 
-      let noteOffMessage = [0x80 | channel, value, 0x40];
-      this.output.send( noteOnMessage, time ); 
-      this.output.send( noteOffMessage, time + this.noteLength );                                                              
+
     }
   }
 
