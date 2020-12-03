@@ -4,13 +4,13 @@ class NoteScheduler {
   constructor() {
     store.subscribe(this.storeUpdated);
     this.state = store.getState();
-    this.nextNoteTime = null; 
+    this.nextNoteTime = 0; 
     this.notesInQueue = [];
     this.current16thNote = 0;
     this.noteLength = 1000 / (this.state.tempo / 60);
     this.currentVal = 0;
     this.output = null;
-    this.scheduleAheadTime = 100;
+    this.scheduleAheadTime = 150;
     this.tempo = this.state.tempo;
     this.enables = this.state.enables;
     this.lastNoteTimeStamp = null;
@@ -76,8 +76,9 @@ class NoteScheduler {
   }
 
 
-  scheduler(notes) {
-    while (this.nextNoteTime < (window.performance.now() + this.scheduleAheadTime)) {
+  scheduler(currentTime, notes) {
+    while (this.nextNoteTime < (currentTime + this.scheduleAheadTime)) {
+      // console.log('scheduling...', notes)
       notes.forEach(note => {
         let [value, index] = note;
 

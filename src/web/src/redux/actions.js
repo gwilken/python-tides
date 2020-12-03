@@ -8,6 +8,14 @@ export const setWindowSize = ({size}) => ({
 })
 
 
+export const setVisibilityState = ({visibilityState}) => ({
+  type: 'visible/set',
+  payload: {
+    visibilityState
+  }
+})
+
+
 export const setChannel = ({id, channel}) => ({
   type: 'channel/set',
   payload: {

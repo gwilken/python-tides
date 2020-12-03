@@ -3,6 +3,7 @@ import './App.scss';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setWindowSize } from '../redux/actions';
+import { setVisibilityState } from '../redux/actions';
 
 import Map from './Map/Map';
 import AudioPanel from './AudioPanel/AudioPanel';
@@ -34,6 +35,10 @@ function App() {
     }));
   }))
 
+
+  document.addEventListener('visibilitychange', () => {
+    dispatch(setVisibilityState({visibilityState: document.visibilityState}))
+  })
 
   return (
     <div className="fullscreen-container">

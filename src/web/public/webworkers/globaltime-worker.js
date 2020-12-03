@@ -1,12 +1,13 @@
-console.log('metro start');
+console.log('globaltime worker loaded');
 
-let interval = 25;
+let interval = 10;
 let intervalId;
 
 onmessage = function (e) {
+  console.log('globaltime worker start')
   if (e.data == 'start') {
     intervalId = setInterval(() => {
-      postMessage('tick');
+      postMessage(performance.now());
     }, interval);
   }
 
@@ -18,9 +19,3 @@ onmessage = function (e) {
     interval = e.data.interval
   }
 }
-
-
-
-
-// TODO: start / stop
-

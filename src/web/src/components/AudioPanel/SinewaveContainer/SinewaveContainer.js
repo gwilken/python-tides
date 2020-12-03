@@ -8,6 +8,17 @@ import Controls from './Controls/Controls';
 
 import './SinewaveContainer.scss';
 
+let globalTime;
+let globalTimeWorker = new Worker('/webworkers/globaltime-worker.js');
+globalTimeWorker.postMessage('start')
+
+globalTimeWorker.onmessage = function(e) {
+  globalTime = e.data;
+}
+
+let schedulerWorker = new Worker('/webworkers/scheduler-worker.js');
+schedulerWorker.postMessage('start')
+
 
 const SinewaveContainer = ({ sines }) => {
   const wrapperRefs = useRef(sines.map(() => createRef()));
@@ -15,6 +26,7 @@ const SinewaveContainer = ({ sines }) => {
   const repeatRefs = useRef(sines.map(() => createRef()));
   const translateXRefs = useRef(sines.map(() => createRef()));
   const sinesDataArr = useRef(sines.map(() => createRef()));
+  const computedWidths = useRef(sines.map(() => createRef()));
 
   let windowSize = useSelector(state => state.windowSize);
   let speed = useSelector(state => state.speed);
@@ -22,20 +34,20 @@ const SinewaveContainer = ({ sines }) => {
   let notes = useSelector(state => state.notes);
   let enables = useSelector(state => state.enables);
 
-  let sinesCurrentVal = sines.map(() => [])
   let setBeatValue = {};
 
 
   useEffect(() => {
-    console.log('DRAWWWW')
     /////// DRAW SETUP START //////////
 
-    // save calc in array so we dont recalc every tick to get value
-    // we'll use css tranform translateX instead of redrawing every frame for performance
+    // save calcs in array so we dont recalc every tick to get value
+    // we'll use css tranform translateX instead of redrawing every frame for best performance
     sines.forEach((data, index) => {
       const wrapper = wrapperRefs.current[index].current;
       const computedHeight = window.getComputedStyle(wrapper).getPropertyValue('height').slice(0, -2);
       const computedWidth = window.getComputedStyle(wrapper).getPropertyValue('width').slice(0, -2);
+
+      computedWidths.current[index].current = parseFloat(computedWidth);
 
       const canvas = document.createElement('canvas');
       const canvasContext = canvas.getContext('2d', { alpha: false });
@@ -114,115 +126,80 @@ const SinewaveContainer = ({ sines }) => {
 
 
   useEffect(() => {
-    // schedule first note only once
-    let start = window.performance.now();
-    noteScheduler.nextNoteTime = start;
+    // schedule first note only once;
+    noteScheduler.nextNoteTime = window.performance.now();
   }, [])
-
-  // let setBeatIndicator = setBeatValue;
-
-
-  // document.addEventListener('visibilitychange', () => {
-  //   if (document.visibilityState === 'visible') {
-  //     isVisible = true;
-  //   } else {
-  //     isVisible = false;
-  //   }  
-  // })
 
 
   ////// ANIMATION START //////////
   useEffect(() => {
-    console.log('ANIMATION>>>>>')
-    let then = window.performance.now();
-    let elapsed;
     let requestId;
 
-    const loop = (now) => {
+    const loop = () => {
       requestId = requestAnimationFrame(loop);
       
-      if (now === undefined) {
-        now = then;
-      }
-
-      elapsed = now - then;
-
-      let sendNotes = [];
-
       sines.forEach((data, index) => {
         let repeat = repeatRefs.current[index].current;
-        let xOffset = (now / speed) % (100 / repeat);
+        let xOffset = (globalTime / speed) % (100 / repeat);
         translateXRefs.current[index].current = xOffset;
         divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
-
-        let length = sinesDataArr.current[index].current.length;
-        let offsetPercent = xOffset * .01;
-
-        if (length) {
-          // gets value at read head. 250 = half of wrapper width
-          // TODO: remove hard coded value
-          let arrIndex = Math.floor((length * offsetPercent) + 250);
-          // wrap around in case we over shoot arr length
-          let val = sinesDataArr.current[index].current[arrIndex % length];
-          
-          sinesCurrentVal[index] = val;
-
-          // let lookAheadIndex = Math.floor((length * offsetPercent) + 275)
-          // let lookAheadVal = sinesDataArr.current[index].current[lookAheadIndex % length];
-          
-          let range = ranges[index];
-          let note = notes[index];
-          
-          // let midiValue = note + Math.floor((lookAheadVal * range) / 2)
-          // let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
-          
-          let midiValue = note + Math.floor((val * range) / 2)
-          let clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
-
-          // 25 = 375px read ahead minus 250px head position
-          // let scheduleTimeOffset = (speed / 16.6666) * 25;
-          
-          // every 50ms schedule future notes
-          // index is == to channel
-          // if (elapsed > 50) {
-            // console.log('schedule for:', clampedMidiValue, index)
-            sendNotes.push([clampedMidiValue, index]);
-            // noteScheduler.scheduler(clampedMidiValue, scheduleTimeOffset, index);
-            then = now
-
-          // }
-        }
-
-        // set disabled visual style
-        if (!enables[index]) {
-          divRefs.current[index].current.style.filter = 'grayscale(1)';
-        } else {
-          divRefs.current[index].current.style.filter = '';
-        }
       })
 
-        noteScheduler.scheduler(sendNotes);
-
-        while (noteScheduler.notesInQueue.length && noteScheduler.notesInQueue[0].time < now) {
-          let currentNote = noteScheduler.notesInQueue.splice(0,1);   // remove note from queue
-          let { index } = currentNote[0];
-
+      while (noteScheduler.notesInQueue.length && noteScheduler.notesInQueue[0].time < globalTime) {
+        let currentNote = noteScheduler.notesInQueue.splice(0,1);
+        let { index } = currentNote[0];
+  
+        if (setBeatValue[index]) {
           setTimeout(() => {
             setBeatValue[index](currentNote[0]);
           }, 0);
         }
-
+      }
     }
     
     loop();
-    
+  
     return () => {
-        cancelAnimationFrame(requestId);
-      }
-    }, [speed, ranges, notes, enables, windowSize])
+      cancelAnimationFrame(requestId);
+    }
+  }, [speed, enables, windowSize])
 
 
-  // pass this child components setValue up to avoid
+  // return value of sinewave[index] based on current time
+  function returnMidiValueNow(index) {
+    let canvasWidth = computedWidths.current[index].current;
+    let clampedMidiValue;
+    let repeat = repeatRefs.current[index].current;
+    let xOffset = (globalTime / speed) % (100 / repeat);
+    let length = sinesDataArr.current[index].current.length;
+    let offsetPercent = xOffset * .01;
+
+    if (length) {
+      // gets value at read head. half of wrapper width is middle
+      let arrIndex = Math.floor((length * offsetPercent) + (canvasWidth / 2));
+      let val = sinesDataArr.current[index].current[arrIndex % length];
+
+      let range = ranges[index];
+      let note = notes[index];
+      let midiValue = note + Math.floor((val * range) / 2)
+      clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
+    }
+
+    return clampedMidiValue;
+  }
+
+
+  schedulerWorker.onmessage = function(e) {
+    if (e.data == 'tick') {
+      let midiValues = sines.map((data, index) => {
+        return [returnMidiValueNow(index), index]
+      })
+      noteScheduler.scheduler(globalTime, midiValues);
+    }
+  }
+
+
+  // pass this child components setValue up from child component to avoid
   // using redux dispatch because of performance issues 
   const onBeatIndicatorMount = ([id, setValue]) => {
     setBeatValue[id] = setValue;
@@ -235,7 +212,10 @@ const SinewaveContainer = ({ sines }) => {
         sines.map((data, index) => (
           <div className="sinewave-container">
             <div className="canvas-wrapper" ref={ wrapperRefs.current[index] }>
-              <div className="sine-div" ref={ divRefs.current[index] }></div>
+              <div 
+                className={`sine-div ${enables[index] ? '' : 'disabled'}`} 
+                ref={ divRefs.current[index] }></div>
+             
               <div className="read-head"></div>
               <div className="label">{data.description}</div>
             </div>

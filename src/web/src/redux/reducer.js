@@ -1,6 +1,7 @@
 
 const initialState = {
   windowSize: {width: window.innerWidth, height: window.innerHeight},
+  visibilityState: 'visible',
   selectedStation: null,
   harmonics: [],
   tempo: 120,
@@ -16,7 +17,6 @@ const initialState = {
   currentBeats: [...new Array(8)].map(elem => 0),
   enables: [...new Array(8)].map(elem => true),
   beatSelections: [...new Array(8)].map(elem => [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true])
-  // tempos: [...new Array(8)].map(elem => 120)
 };
 
 
@@ -27,6 +27,13 @@ export default function(state = initialState, action) {
         ...state,
         windowSize: action.payload.size
       }
+
+      case 'visible/set':
+      return {
+        ...state,
+        visibilityState: action.payload.visibilityState
+      }
+
     case 'tempo/set':
       return {
         ...state,
@@ -120,7 +127,7 @@ export default function(state = initialState, action) {
       newBeatSelections[action.payload.id] = action.payload.beats;
       return {
         ...state,
-        enables: [...newBeatSelections]
+        beatSelections: [...newBeatSelections]
       }
   
 
