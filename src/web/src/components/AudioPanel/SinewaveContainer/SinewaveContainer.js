@@ -140,7 +140,9 @@ const SinewaveContainer = ({ sines }) => {
       
       sines.forEach((data, index) => {
         let repeat = repeatRefs.current[index].current;
-        let xOffset = (globalTime / globalSpeed) % (100 / repeat);
+        // (1000 - globalSpeed) because 1000 is max of input range and we want 
+        // speed to increase as value does, so we subtract max value to flip it.
+        let xOffset = (globalTime / (1000 - globalSpeed)) % (100 / repeat);
         translateXRefs.current[index].current = xOffset;
         divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
       })
@@ -170,7 +172,7 @@ const SinewaveContainer = ({ sines }) => {
     let canvasWidth = computedWidths.current[index].current;
     let clampedMidiValue;
     let repeat = repeatRefs.current[index].current;
-    let xOffset = (globalTime / globalSpeed) % (100 / repeat);
+    let xOffset = (globalTime / (1000 - globalSpeed)) % (100 / repeat);
     let length = sinesDataArr.current[index].current.length;
     let offsetPercent = xOffset * .01;
 
@@ -190,6 +192,7 @@ const SinewaveContainer = ({ sines }) => {
 
 
   schedulerWorker.onmessage = function(e) {
+    // we only need to calc midi values when we schedule them
     if (e.data == 'tick') {
       let midiValues = sines.map((data, index) => {
         return [returnMidiValueNow(index), index]
