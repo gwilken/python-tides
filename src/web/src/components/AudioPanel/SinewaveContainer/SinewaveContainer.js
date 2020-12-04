@@ -29,7 +29,7 @@ const SinewaveContainer = ({ sines }) => {
   const computedWidths = useRef(sines.map(() => createRef()));
 
   let windowSize = useSelector(state => state.windowSize);
-  let speed = useSelector(state => state.speed);
+  let globalSpeed = useSelector(state => state.speed);
   let ranges = useSelector(state => state.ranges);
   let notes = useSelector(state => state.notes);
   let enables = useSelector(state => state.enables);
@@ -140,7 +140,7 @@ const SinewaveContainer = ({ sines }) => {
       
       sines.forEach((data, index) => {
         let repeat = repeatRefs.current[index].current;
-        let xOffset = (globalTime / speed) % (100 / repeat);
+        let xOffset = (globalTime / globalSpeed) % (100 / repeat);
         translateXRefs.current[index].current = xOffset;
         divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
       })
@@ -162,7 +162,7 @@ const SinewaveContainer = ({ sines }) => {
     return () => {
       cancelAnimationFrame(requestId);
     }
-  }, [speed, enables, windowSize])
+  }, [globalSpeed, enables, windowSize])
 
 
   // return value of sinewave[index] based on current time
@@ -170,7 +170,7 @@ const SinewaveContainer = ({ sines }) => {
     let canvasWidth = computedWidths.current[index].current;
     let clampedMidiValue;
     let repeat = repeatRefs.current[index].current;
-    let xOffset = (globalTime / speed) % (100 / repeat);
+    let xOffset = (globalTime / globalSpeed) % (100 / repeat);
     let length = sinesDataArr.current[index].current.length;
     let offsetPercent = xOffset * .01;
 
@@ -182,7 +182,7 @@ const SinewaveContainer = ({ sines }) => {
       let range = ranges[index];
       let note = notes[index];
       let midiValue = note + Math.floor((val * range) / 2)
-      clampedMidiValue = Math.min(Math.max(midiValue, 21), 127);
+      clampedMidiValue = Math.min(Math.max(midiValue, 0), 127);
     }
 
     return clampedMidiValue;

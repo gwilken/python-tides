@@ -81,14 +81,12 @@ class NoteScheduler {
     
       if (this.modes[index] === 'NOTE_ON') {
         let onMessage = [0x90 | channel, value, 0x7f]; 
-        this.output.send( onMessage, time ); 
         let offMessage = [0x80 | channel, value, 0x40];
+        this.output.send( onMessage, time ); 
         this.output.send( offMessage, time + this.noteLength );                                                              
       } else if (this.modes[index] === 'CC') {
         this.output.send( [0xB0 | channel, this.parameters[index], value], time); 
       }
-
-
     }
   }
 

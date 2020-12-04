@@ -12,7 +12,7 @@ const SelectSpeed = () => {
       <input 
         name="global-speed"
         type="range"
-        min="1"
+        min="10"
         max="1000"
         step="10"
         value={ speed }
