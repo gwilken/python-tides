@@ -2,8 +2,10 @@
 const initialState = {
   windowSize: {width: window.innerWidth, height: window.innerHeight},
   visibilityState: 'visible',
-  selectedStation: null,
+  collapsed: false,
+  stations: [],
   harmonics: [],
+  selectedStation: null,
   tempo: 120,
   speed: 650,
   availableDevices: [],
@@ -28,10 +30,34 @@ export default function(state = initialState, action) {
         windowSize: action.payload.size
       }
 
-      case 'visible/set':
+    case 'visible/set':
       return {
         ...state,
         visibilityState: action.payload.visibilityState
+      }
+
+    case 'collapsed/set':
+      return {
+        ...state,
+        collapsed: action.payload.collapsed
+      }
+
+    case 'stations/set':
+      return {
+        ...state,
+        stations: action.payload.data
+      }
+
+    case 'station/set':
+      return {
+        ...state,
+        selectedStation: action.payload.data
+      }
+
+    case 'harmonics/set':
+      return {
+        ...state,
+        harmonics: action.payload.data
       }
 
     case 'tempo/set':

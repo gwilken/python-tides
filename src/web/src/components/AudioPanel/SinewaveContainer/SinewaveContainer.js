@@ -17,10 +17,10 @@ globalTimeWorker.onmessage = function(e) {
 }
 
 let schedulerWorker = new Worker('/webworkers/scheduler-worker.js');
-schedulerWorker.postMessage('start')
 
 
 const SinewaveContainer = ({ sines }) => {
+  console.log('sinewave cont render')
   const wrapperRefs = useRef(sines.map(() => createRef()));
   const divRefs = useRef(sines.map(() => createRef()));
   const repeatRefs = useRef(sines.map(() => createRef()));
@@ -35,6 +35,7 @@ const SinewaveContainer = ({ sines }) => {
   let enables = useSelector(state => state.enables);
 
   let setBeatValue = {};
+  let beatRefs = {};
 
 
   useEffect(() => {
@@ -122,11 +123,15 @@ const SinewaveContainer = ({ sines }) => {
       divRefs.current[index].current.style.backgroundImage = `url(${image})`;
       divRefs.current[index].current.style.width = `${canvasWidth}px`;
     })
-  }, [windowSize])
+
+    // console.log('computedWidths', computedWidths)
+
+  }, [windowSize, sines])
 
 
   useEffect(() => {
     // schedule first note only once;
+
     noteScheduler.nextNoteTime = window.performance.now();
   }, [])
 
@@ -151,9 +156,12 @@ const SinewaveContainer = ({ sines }) => {
         let currentNote = noteScheduler.notesInQueue.splice(0,1);
         let { index } = currentNote[0];
   
-        if (setBeatValue[index]) {
+        // if (setBeatValue[index]) {
+        if (beatRefs[index]) {
           setTimeout(() => {
-            setBeatValue[index](currentNote[0]);
+            // setBeatValue[index](currentNote[0]);
+            beatRefs[index].current = currentNote[0];
+            // console.log(beatRefs[index])
           }, 0);
         }
       }
@@ -166,6 +174,10 @@ const SinewaveContainer = ({ sines }) => {
     }
   }, [globalSpeed, enables, windowSize])
 
+
+  useEffect(() => {
+    schedulerWorker.postMessage('start')
+  }, [])
 
   // return value of sinewave[index] based on current time
   function returnMidiValueNow(index) {
@@ -204,8 +216,10 @@ const SinewaveContainer = ({ sines }) => {
 
   // pass this child components setValue up from child component to avoid
   // using redux dispatch because of performance issues 
-  const onBeatIndicatorMount = ([id, setValue]) => {
-    setBeatValue[id] = setValue;
+  // const onBeatIndicatorMount = ([id, setValue]) => {
+  const onBeatIndicatorMount = ([id, beatRef]) => {
+    // setBeatValue[id] = setValue;
+    beatRefs[id] = beatRef;
   }
 
 

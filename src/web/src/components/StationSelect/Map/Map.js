@@ -1,10 +1,23 @@
-import './Map.scss'
+import './Map.scss';
 
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { 
+  setHarmonics, 
+  setSelectedStation, 
+  setStations,
+  setCollapsed } from '../../../redux/actions';
 import mapboxgl from 'mapbox-gl';
 
 let initialCenter = {lng: -79.09460554196545, lat: 28.475889863700047}
 // const initialZoom = [5]
+
+const mapStateToProps = state => {
+  return { 
+    collapsed: state.collapsed,
+    stations: state.stations
+  }
+}
 
 class Map extends Component {
   constructor() {
@@ -13,6 +26,13 @@ class Map extends Component {
   }
 
   componentDidMount() {
+    fetch('/stations/stations.geojson')
+      .then(res => res.json())
+      .then(data => {
+        this.props.setStations(data);
+      })
+
+
     this.map = new mapboxgl.Map({
       accessToken: 'pk.eyJ1IjoiZ3dpbGtlbiIsImEiOiJjanI1ajR6Z2QwMWk1NDRubXYyYmV6OHVkIn0.D68kEgoBzr8IZn8zz40MOQ',
       attributionControl: false,
@@ -101,8 +121,10 @@ class Map extends Component {
       let { properties = { }} = features[0]
   
 
+      console.log('features[0]', features[0])
+
       // fallback to id, id no harcon_id. dont know if this actually will return anything
-      this.updateHarmonics(properties)
+      this.updateHarmonics(features[0])
 
       // TODO: open sines window, display sines
 
@@ -118,6 +140,21 @@ class Map extends Component {
     
     } 
     
+    if (!this.props.collapsed) {
+      this.props.setCollapsed({collapsed: true});
+    }
+
+    this.map.flyTo({
+      center: features[0].geometry.coordinates,
+      zoom: 11
+    });
+
+    // this.map.jumpTo({
+    //   // center: features[0].geometry.coordinates,
+    //   // zoom: zoom
+    // });
+
+
     // else {
     //   this.props.setPopupCoords([0, 0])
     // }
@@ -128,21 +165,16 @@ class Map extends Component {
     console.log('station', station)
     
     // TODO: loading states, error states
+    this.props.setSelectedStation(station)
 
-    let { harcon_id, id } = station
-    
-    console.log('harcon_id:', harcon_id, 'id:', id)
-    
+    let { properties } = station;
+    let { harcon_id, id } = properties;
     let url = harcon_id ? `/harmonics/${harcon_id}.json` : `/harmonics/${id}.json`
     
     fetch(url)
-    .then(res => res.json())
-    .then(data => {
-        this.props.setSelectedStation(station)
+      .then(res => res.json())
+      .then(data => {
         this.props.setHarmonics(data)
-
-        console.log(data)
-
       })
       .catch(e => {
         console.log('error fetching harmonics:', e)
@@ -151,9 +183,11 @@ class Map extends Component {
 
 
 
-  // componentDidUpdate(prevProps) {
-  //   if (this.props.markers !== prevProps.markers) {
-
+  componentDidUpdate(prevProps) {
+    if (this.props.collapsed !== prevProps.collapsed) {
+      this.map.resize();
+    }
+  }
   //     console.log('NEW MARKERS', this.props.markers)
   //     this.map.getSource('geojson-markers').setData(this.props.markers.data); 
 
@@ -383,4 +417,11 @@ class Map extends Component {
 }
 
 
-export default Map
+export default connect(
+  mapStateToProps,
+  { setHarmonics, 
+    setSelectedStation, 
+    setStations,
+    setCollapsed }
+  )
+  (Map)

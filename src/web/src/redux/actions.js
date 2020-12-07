@@ -16,6 +16,30 @@ export const setVisibilityState = ({visibilityState}) => ({
 })
 
 
+export const setCollapsed = ({collapsed}) => ({
+  type: 'collapsed/set',
+  payload: {
+    collapsed
+  }
+})
+
+
+export const setStations = data => ({
+  type: 'stations/set',
+  payload: {
+    data
+  }
+})
+
+
+export const setHarmonics = data => ({
+  type: 'harmonics/set',
+  payload: {
+    data
+  }
+})
+
+
 export const setChannel = ({id, channel}) => ({
   type: 'channel/set',
   payload: {
@@ -121,14 +145,6 @@ export const setEnabled = ({id, enabled}) => ({
 
 export const setSelectedStation = data => ({
   type: 'station/set',
-  payload: {
-    data
-  }
-})
-
-
-export const setHarmonics = data => ({
-  type: 'harmonics/set',
   payload: {
     data
   }

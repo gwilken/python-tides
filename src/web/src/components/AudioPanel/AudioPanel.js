@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux'
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { setAvailableDevices, setSelectedDevice } from '../../redux/actions';
 
 import SinewaveContainer from './SinewaveContainer/SinewaveContainer';
-import Toolbar from './Toolbar/Toolbar'
-import StationLabel from './StationLabel/StationLabel'
-import { normalize } from '../../scripts/utils'
-import useMidiOutputs from '../../hooks/useMidiOutputs'
+import Toolbar from './Toolbar/Toolbar';
+// import { normalize } from '../../scripts/utils'
+import useMidiOutputs from '../../hooks/useMidiOutputs';
+// import { setCollapsed } from '../../redux/actions';
 
 
-const AudioPanel = ({harmonics, selectedStation}) => {
+const AudioPanel = () => {
   const dispatch = useDispatch();
-  const availableDevices = useMidiOutputs([])
-  const selectedDevice = useSelector(state => state.selectedDevice)
+  const availableDevices = useMidiOutputs([]);
+  const selectedDevice = useSelector(state => state.selectedDevice);
+  const harmonics = useSelector(state => state.harmonics);
 
   useEffect(() => {
     if (availableDevices.length) {
@@ -44,18 +45,19 @@ const AudioPanel = ({harmonics, selectedStation}) => {
     sines = filtered.slice(0, 1)
   }
 
-  let output;
 
   // if (availableOutputs.length && outputDeviceId) {
   //   output = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
   // }
 
+  console.log('sines', sines)
 
   return (
     <div className="audio-panel">
-      <StationLabel selectedStation={selectedStation} />
-      <SinewaveContainer sines={ sines } />
+      { sines.length && <SinewaveContainer sines={ sines } /> }
+
       <Toolbar />
+    
     </div>
   )
 }
