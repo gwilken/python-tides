@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { setEnabled } from '../../../../redux/actions';
+import { setEnabled } from '../../../redux/actions';
 
 const ButtonEnable = ({id}) => {
   const dispatch = useDispatch();

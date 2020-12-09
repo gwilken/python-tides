@@ -12,9 +12,9 @@ const SelectSpeed = () => {
       <input 
         name="global-speed"
         type="range"
-        min="10"
+        min="1"
         max="990"
-        step="10"
+        step="1"
         value={ speed }
         onChange={ (e) => dispatch(setSpeed(e.target.value)) } />
     </div>

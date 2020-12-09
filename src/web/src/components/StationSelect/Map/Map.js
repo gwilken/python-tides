@@ -146,6 +146,7 @@ class Map extends Component {
 
     this.map.flyTo({
       center: features[0].geometry.coordinates,
+      offset: [-40, 10],
       zoom: 11
     });
 

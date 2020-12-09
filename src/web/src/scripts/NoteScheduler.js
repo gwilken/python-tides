@@ -72,6 +72,8 @@ class NoteScheduler {
     let { beat, time, value, index } = note; 
     let channel = this.channels[index];
 
+    note.beatActivated = this.beatSelections[index][beat];
+    
     this.notesInQueue.push(note);
 
     if (

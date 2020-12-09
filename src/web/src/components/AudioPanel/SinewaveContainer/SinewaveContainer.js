@@ -1,10 +1,14 @@
 import { useEffect, useRef, createRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { normalize } from '../../../scripts/utils';
 import noteScheduler from '../../../scripts/NoteScheduler';
 
 import BeatIndicator from './BeatIndicator';
 import Controls from './Controls/Controls';
+import OutputValueDisplay from './OutputValueDisplay';
+import SelectChannel from './SelectChannel';
+import ButtonEnable from './ButtonEnable';
+
 
 import './SinewaveContainer.scss';
 
@@ -34,9 +38,8 @@ const SinewaveContainer = ({ sines }) => {
   let notes = useSelector(state => state.notes);
   let enables = useSelector(state => state.enables);
 
-  let setBeatValue = {};
   let beatRefs = {};
-
+  let setOutputDisplay = {};
 
   useEffect(() => {
     /////// DRAW SETUP START //////////
@@ -131,7 +134,6 @@ const SinewaveContainer = ({ sines }) => {
 
   useEffect(() => {
     // schedule first note only once;
-
     noteScheduler.nextNoteTime = window.performance.now();
   }, [])
 
@@ -156,12 +158,15 @@ const SinewaveContainer = ({ sines }) => {
         let currentNote = noteScheduler.notesInQueue.splice(0,1);
         let { index } = currentNote[0];
   
-        // if (setBeatValue[index]) {
         if (beatRefs[index]) {
           setTimeout(() => {
-            // setBeatValue[index](currentNote[0]);
             beatRefs[index].current = currentNote[0];
-            // console.log(beatRefs[index])
+          }, 0);
+        }
+
+        if (setOutputDisplay[index]) {
+          setTimeout(() => {
+            setOutputDisplay[index](currentNote[0]);
           }, 0);
         }
       }
@@ -214,12 +219,15 @@ const SinewaveContainer = ({ sines }) => {
   }
 
 
-  // pass this child components setValue up from child component to avoid
+  // pass this a ref from beatindicator up to avoid
   // using redux dispatch because of performance issues 
-  // const onBeatIndicatorMount = ([id, setValue]) => {
   const onBeatIndicatorMount = ([id, beatRef]) => {
-    // setBeatValue[id] = setValue;
     beatRefs[id] = beatRef;
+  }
+
+
+  const onOutputDisplayMount = ([id, setCurrentBeat]) => {
+    setOutputDisplay[id] = setCurrentBeat;
   }
 
 
@@ -240,6 +248,14 @@ const SinewaveContainer = ({ sines }) => {
             <BeatIndicator onMount={onBeatIndicatorMount} id={index} />
 
             <Controls id={index} />
+            
+            <OutputValueDisplay onMount={onOutputDisplayMount} id={index} />
+
+            <div className="output-container">
+              <ButtonEnable id={index} />
+              <SelectChannel id={index} />
+            </div>
+
           </div>
         ))
       }

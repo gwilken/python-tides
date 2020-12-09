@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { setChannel } from '../../../../redux/actions';
+import { setChannel } from '../../../redux/actions';
 
 
 const SelectChannel = ({ id }) => {

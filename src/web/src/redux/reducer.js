@@ -7,7 +7,7 @@ const initialState = {
   harmonics: [],
   selectedStation: null,
   tempo: 120,
-  speed: 650,
+  speed: 250,
   availableDevices: [],
   selectedDevice: null,
   channels: [...new Array(8)].map((val, index) => index),
