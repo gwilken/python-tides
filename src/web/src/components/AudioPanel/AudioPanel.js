@@ -1,62 +1,27 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setAvailableDevices, setSelectedDevice } from '../../redux/actions';
-
+import { useSelector } from 'react-redux';
 import SinewaveContainer from './SinewaveContainer/SinewaveContainer';
 import Toolbar from './Toolbar/Toolbar';
 import { normalize } from '../../scripts/utils'
-import useMidiOutputs from '../../hooks/useMidiOutputs';
-// import { setCollapsed } from '../../redux/actions';
 
 
 const AudioPanel = () => {
-  const dispatch = useDispatch();
-  const availableDevices = useMidiOutputs([]);
-  const selectedDevice = useSelector(state => state.selectedDevice);
   const harmonics = useSelector(state => state.harmonics);
-
-  useEffect(() => {
-    if (availableDevices.length) {
-      dispatch(setAvailableDevices(availableDevices));
-    }
-  }, [availableDevices])
-
-
-  // react if selected output was removed
-  useEffect(() => {
-    if (availableDevices && availableDevices.length > 0) {
-      let ids = availableDevices.map(output => output.id)
-      if(ids.indexOf(selectedDevice) === -1) {
-        dispatch(setSelectedDevice(''))
-      }
-    }
-  }, [availableDevices])
-
 
   let sines = [];
   
-  if (harmonics && harmonics['HarmonicConstituents'] && harmonics['HarmonicConstituents'].length > 0) {
-    
+  if (harmonics && harmonics['HarmonicConstituents'] && harmonics['HarmonicConstituents'].length > 0) {    
     let filtered = harmonics['HarmonicConstituents'].filter(entry => entry['amplitude'] > 0)
     const amps = filtered.map(entry => entry.amplitude)
     const max = Math.max(...amps)
     const min = Math.min(...amps)
 
-    sines = filtered.slice(0, 5).map(sine => {
+    sines = filtered.slice(0, 2).map(sine => {
       let normalizedAmp = normalize(sine.amplitude, max, min)
       sine.amplitude = normalizedAmp
       return sine
     })
-
-    console.log(min, max, sines)
   }
 
-
-  // if (availableOutputs.length && outputDeviceId) {
-  //   output = availableOutputs.filter(({id}) => id == outputDeviceId)[0]
-  // }
-
-  console.log('sines', sines)
 
   return (
     <div className="audio-panel">

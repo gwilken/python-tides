@@ -118,10 +118,10 @@ class Map extends Component {
     })
 
     if (features && features.length > 0) {
-      let { properties = { }} = features[0]
+      // let { properties = { }} = features[0]
   
 
-      console.log('features[0]', features[0])
+      // console.log('features[0]', features[0])
 
       // fallback to id, id no harcon_id. dont know if this actually will return anything
       this.updateHarmonics(features[0])
@@ -163,7 +163,7 @@ class Map extends Component {
 
 
   updateHarmonics = (station) => {
-    console.log('station', station)
+    // console.log('station', station)
     
     // TODO: loading states, error states
     this.props.setSelectedStation(station)

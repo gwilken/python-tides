@@ -1,4 +1,4 @@
-export default [
+const beatArr = [
   {
     label: 'every beat',
     pattern: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
@@ -21,4 +21,4 @@ export default [
   }
 ]
 
-
+export default beatArr;

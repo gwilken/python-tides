@@ -88,6 +88,10 @@
     &.disabled {
       filter: grayscale(1);
     }
+
+    .selects-container {
+      display: flex;
+    }
   }
 
 

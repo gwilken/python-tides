@@ -31,7 +31,10 @@ const StationSelect = () => {
       
       <div className={`map-container ${collapsed ? 'collapsed' : ''}`}>
         <div className="collapse-button" onClick={ () => dispatch(setCollapsed({collapsed: !collapsed}))}>
-          <img src={collapsed ? expand : collapse} />
+          <img 
+            src={collapsed ? expand : collapse} 
+            alt="expand and collapse map" />
+        
         </div>
 
         <Map />

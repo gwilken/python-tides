@@ -9,7 +9,7 @@ const initialState = {
   tempo: 120,
   speed: 250,
   availableDevices: [],
-  selectedDevice: null,
+  selectedDevice: '',
   channels: [...new Array(8)].map((val, index) => index),
   modes: [...new Array(8)].map(elem => 'NOTE_ON'),
   parameters: [...new Array(8)].map(elem => 0x03),
@@ -18,11 +18,12 @@ const initialState = {
   values: [...new Array(8)].map(elem => 0),
   currentBeats: [...new Array(8)].map(elem => 0),
   enables: [...new Array(8)].map(elem => true),
-  beatSelections: [...new Array(8)].map(elem => [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true])
+  beatSelections: [...new Array(8)].map(elem => [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true]),
+  noteLengths: [...new Array(8)].map(elem => 0.25)
 };
 
 
-export default function(state = initialState, action) {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'window/set':
       return {
@@ -155,9 +156,21 @@ export default function(state = initialState, action) {
         ...state,
         beatSelections: [...newBeatSelections]
       }
+
+    case 'noteLength/set':
+      let newNoteLengths = state.noteLengths;
+      newNoteLengths[action.payload.id] = action.payload.length;
+      return {
+        ...state,
+        noteLengths: [...newNoteLengths]
+      }
   
 
     default:
       return state;
   }
 }
+
+
+export default reducer;
+

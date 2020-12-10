@@ -22,9 +22,9 @@ const Controls = ({id}) => {
 
   let SecondarySelect;
 
-  if (modes[id] == 'NOTE_ON') {
+  if (modes[id] === 'NOTE_ON') {
     SecondarySelect = <SelectNote id={id} />;
-  } else if (modes[id] == 'CC') {
+  } else if (modes[id] === 'CC') {
     SecondarySelect = <SelectCC id={id} />;
   }
 

@@ -17,7 +17,13 @@ const SelectTempoRange = () => {
         value={tempo}
         step="1"
         onChange={ (e) => dispatch(setTempo({tempo: e.target.value})) }
+        list="steplist"
       />
+      <datalist id="steplist">
+        <option>60</option>
+        <option>120</option>
+        <option>240</option>
+      </datalist>
       <div className="range-label">
         { tempo } BPM
       </div>

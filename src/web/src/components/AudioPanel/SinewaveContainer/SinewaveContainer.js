@@ -1,5 +1,5 @@
 import { useEffect, useRef, createRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { normalize } from '../../../scripts/utils';
 import noteScheduler from '../../../scripts/NoteScheduler';
 
@@ -21,10 +21,9 @@ globalTimeWorker.onmessage = function(e) {
 }
 
 let schedulerWorker = new Worker('/webworkers/scheduler-worker.js');
-
+let lastGlobalTime;
 
 const SinewaveContainer = ({ sines }) => {
-  console.log('sinewave cont render')
   const wrapperRefs = useRef(sines.map(() => createRef()));
   const divRefs = useRef(sines.map(() => createRef()));
   const repeatRefs = useRef(sines.map(() => createRef()));
@@ -143,6 +142,8 @@ const SinewaveContainer = ({ sines }) => {
     let requestId;
 
     const loop = () => {
+      let elapsed = globalTime - lastGlobalTime;
+
       requestId = requestAnimationFrame(loop);
       
       sines.forEach((data, index) => {
@@ -158,18 +159,26 @@ const SinewaveContainer = ({ sines }) => {
         let currentNote = noteScheduler.notesInQueue.splice(0,1);
         let { index } = currentNote[0];
   
-        if (beatRefs[index]) {
-          setTimeout(() => {
-            beatRefs[index].current = currentNote[0];
-          }, 0);
-        }
+        console.log( currentNote[0])
 
-        if (setOutputDisplay[index]) {
-          setTimeout(() => {
-            setOutputDisplay[index](currentNote[0]);
-          }, 0);
+        // this is to avoid the animation racing to catch up to current time 
+        // after tab has been throttled due to chrome background tab policy
+        if (elapsed < 1000) {
+          if (beatRefs[index]) {
+            setTimeout(() => {
+              beatRefs[index].current = currentNote[0];
+            }, 0);
+          }
+
+          if (setOutputDisplay[index]) {
+            setTimeout(() => {
+              setOutputDisplay[index](currentNote[0]);
+            }, 0);
+          }
         }
       }
+
+      lastGlobalTime = globalTime;
     }
     
     loop();
@@ -177,7 +186,8 @@ const SinewaveContainer = ({ sines }) => {
     return () => {
       cancelAnimationFrame(requestId);
     }
-  }, [globalSpeed, enables, windowSize])
+    // eslint-disable-next-line
+  }, [globalSpeed, enables, windowSize, setOutputDisplay, sines])
 
 
   useEffect(() => {
@@ -210,7 +220,7 @@ const SinewaveContainer = ({ sines }) => {
 
   schedulerWorker.onmessage = function(e) {
     // we only need to calc midi values when we schedule them
-    if (e.data == 'tick') {
+    if (e.data === 'tick') {
       let midiValues = sines.map((data, index) => {
         return [returnMidiValueNow(index), index]
       })
@@ -232,17 +242,19 @@ const SinewaveContainer = ({ sines }) => {
 
 
   return (
-    <div className="sines-container">
+    <div>
       {
         sines.map((data, index) => (
-          <div className="sinewave-container">
+          <div 
+            className="sinewave-container"
+            key={'sinecontainer-' + index}>
             <div className="canvas-wrapper" ref={ wrapperRefs.current[index] }>
               <div 
                 className={`sine-div ${enables[index] ? '' : 'disabled'}`} 
                 ref={ divRefs.current[index] }></div>
              
               <div className="read-head"></div>
-              <div className="label">{data.description}</div>
+              <div className="label">{data.description} ({data.name})</div>
             </div>
             
             <BeatIndicator onMount={onBeatIndicatorMount} id={index} />

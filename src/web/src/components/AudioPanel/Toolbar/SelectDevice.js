@@ -1,12 +1,34 @@
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSelectedDevice } from '../../../redux/actions';
+import { setAvailableDevices, setSelectedDevice } from '../../../redux/actions';
+import useMidiOutputs from '../../../hooks/useMidiOutputs';
 
 
 const SelectDevice = () => {
-  const availableOutputs = useSelector(state => state.availableDevices)
+  // const availableDevices = useSelector(state => state.availableDevices)
   const selectedDevice = useSelector(state => state.selectedDevice)
+  const availableDevices = useMidiOutputs([]);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    if (availableDevices.length) {
+      dispatch(setAvailableDevices(availableDevices));
+    }
+  }, [availableDevices, dispatch])
+
+
+  // react if selected output was removed
+  useEffect(() => {
+    if (availableDevices && availableDevices.length > 0) {
+      let ids = availableDevices.map(output => output.id)
+      if(ids.indexOf(selectedDevice) === -1) {
+        dispatch(setSelectedDevice(''))
+      }
+    }
+  }, [availableDevices, selectedDevice, dispatch])
+
 
   return (
     <div className="custom-select ">
@@ -16,7 +38,7 @@ const SelectDevice = () => {
         value={ selectedDevice }
         onChange={ (e) => dispatch(setSelectedDevice(e.target.value)) }>
 
-        { availableOutputs && availableOutputs.map((output, index) => (
+        { availableDevices && availableDevices.map((output, index) => (
           <option 
             value={ output.id }
             key={ output.id }>

@@ -177,4 +177,12 @@ export const setBeatSelections = ({id, beats}) => ({
   }
 }) 
 
+export const setNoteLength = ({id, length}) => ({
+  type: 'noteLength/set',
+  payload: {
+    id,
+    length
+  }
+}) 
+
 

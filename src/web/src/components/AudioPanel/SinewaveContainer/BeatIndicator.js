@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBeatSelections } from '../../../redux/actions';
 import SelectBeatPattern from './SelectBeatPattern';
+import SelectNoteLength from './SelectNoteLength';
 
 
 const BeatIndicator = ({id, onMount}) => {
@@ -11,11 +12,13 @@ const BeatIndicator = ({id, onMount}) => {
   let beatRef = useRef(0);
   let canvasRef = useRef(null);
   let contextRef = useRef();
+  let boundingRect = useRef();
+  let height = useRef();
+  let beatWidth = useRef();
 
   let enables = useSelector(state => state.enables);
   let beatSelections = useSelector(state => state.beatSelections[id]);
 
-  let boundingRect;
   let mouse;
 
   let dispatch = useDispatch();
@@ -25,22 +28,15 @@ const BeatIndicator = ({id, onMount}) => {
   }, [onMount, id]);
 
 
-  let numOfBeats = 16;
-  let spacer ;
-  let spacerWidths;
-  let beatWidth;
-  let height;
   let hoveredIndex;
-  let requestId;
-  let lastBeat;
 
-  let { beat } = beatRef.current;
+  // let { beat } = beatRef.current;
 
 
   function redrawCanvas() {
     let { beat } = beatRef.current;
 
-    for (let i = 0; i < numOfBeats; i++ ) {
+    for (let i = 0; i < 16; i++ ) {
       contextRef.current.beginPath();
       
       if (i === beat) {
@@ -58,35 +54,34 @@ const BeatIndicator = ({id, onMount}) => {
       else {
         contextRef.current.fillStyle = '#ececec';
       }
-      contextRef.current.fillRect(((beatWidth + spacer) * i), 0, beatWidth, height); 
+      contextRef.current.fillRect(((beatWidth.current + 3) * i), 0, beatWidth.current, height.current); 
     }
   }
 
 
   useEffect(() => {
+    let requestId;
+    let lastBeat;
+
     //// INITIAL DRAW SETUP //////
     contextRef.current = canvasRef.current.getContext('2d', { alpha: false });
     setComputedHeight(window.getComputedStyle(canvasRef.current).getPropertyValue('height').slice(0, -2));
     setComputedWidth(window.getComputedStyle(canvasRef.current).getPropertyValue('width').slice(0, -2));
     
-    boundingRect = canvasRef.current.getBoundingClientRect();
+    boundingRect.current = canvasRef.current.getBoundingClientRect();
 
     const scale = window.devicePixelRatio;
     const width = Math.floor(scale * computedWidth)
-    height = scale * computedHeight;
+    height.current = scale * computedHeight;
 
     contextRef.current.fillStyle = 'white';
-    contextRef.current.clearRect(0, 0, width, height);
+    contextRef.current.clearRect(0, 0, width, height.current);
 
-    spacer = 3;
-    spacerWidths = (numOfBeats - 1) * spacer;
-    beatWidth = (computedWidth - spacerWidths) / numOfBeats;
+    let spacerWidths = (16 - 1) * 3;
+    beatWidth.current = (computedWidth - spacerWidths) / 16;
 
-    redrawCanvas()
-  })
+    redrawCanvas();
 
-
-  useEffect(() => {
     function loop() {
       requestId = requestAnimationFrame(loop);
 
@@ -104,7 +99,8 @@ const BeatIndicator = ({id, onMount}) => {
     return () => {
       cancelAnimationFrame(requestId);
     }
-  })
+    // eslint-disable-next-line
+  }, [computedWidth, computedHeight, beatSelections])
 
 
 
@@ -116,13 +112,13 @@ const BeatIndicator = ({id, onMount}) => {
 
 
   function handleMouseMove(e) {
-    if (boundingRect) {
-      let {top, left} = boundingRect;
+    if (boundingRect.current) {
+      let {top, left} = boundingRect.current;
       mouse = {
         x: e.clientX - left,
         y: e.clientY - top
       }
-      hoveredIndex = Math.floor(mouse.x / (beatWidth + spacer));
+      hoveredIndex = Math.floor(mouse.x / (beatWidth.current + 3));
     }
 
     redrawCanvas();
@@ -151,7 +147,10 @@ const BeatIndicator = ({id, onMount}) => {
         width={computedWidth} 
         height={computedHeight} />
      
-      <SelectBeatPattern id={id} />
+      <div className="selects-container">
+        <SelectNoteLength id={id} />
+        <SelectBeatPattern id={id} />
+      </div>
     </div>
   )
 }

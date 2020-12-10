@@ -1,5 +1,5 @@
 import store from '../redux/store';
-import { MODES } from '../constants/midi-modes'
+// import { MODES } from '../constants/midi-modes'
 
 class NoteScheduler {
   constructor() {
@@ -8,7 +8,7 @@ class NoteScheduler {
     this.nextNoteTime = 0; 
     this.notesInQueue = [];
     this.current16thNote = 0;
-    this.noteLength = 1000 / (this.state.tempo / 60);
+    // this.noteLength = 1000 / (this.state.tempo / 60);
     this.currentVal = 0;
     this.output = null;
     this.scheduleAheadTime = 150;
@@ -19,6 +19,7 @@ class NoteScheduler {
     this.channels = this.state.channels;
     this.modes = this.state.modes;
     this.parameters = this.state.parameters;
+    this.noteLengths = this.state.noteLengths;
   }
 
 
@@ -56,6 +57,10 @@ class NoteScheduler {
     if (this.parameters !== state.parameters) {
       this.parameters = state.parameters;
     }
+ 
+    if (this.noteLengths !== state.noteLengths) {
+      this.noteLengths = state.noteLengths;
+    }
   }
 
 
@@ -63,7 +68,7 @@ class NoteScheduler {
     let secondsPerBeat = 60.0 / this.tempo;
     this.nextNoteTime += 1000 * secondsPerBeat;
     this.current16thNote++;
-    if (this.current16thNote == 16) {
+    if (this.current16thNote === 16) {
       this.current16thNote = 0;
     }
   }
@@ -71,9 +76,11 @@ class NoteScheduler {
   scheduleNote(note) {
     let { beat, time, value, index } = note; 
     let channel = this.channels[index];
+    let noteLength = ((this.tempo / 60) * this.noteLengths[index]) * 1000;
 
     note.beatActivated = this.beatSelections[index][beat];
-    
+    note.noteLength = noteLength;
+
     this.notesInQueue.push(note);
 
     if (
@@ -85,7 +92,7 @@ class NoteScheduler {
         let onMessage = [0x90 | channel, value, 0x7f]; 
         let offMessage = [0x80 | channel, value, 0x40];
         this.output.send( onMessage, time ); 
-        this.output.send( offMessage, time + this.noteLength );                                                              
+        this.output.send( offMessage, time + noteLength );                                                              
       } else if (this.modes[index] === 'CC') {
         this.output.send( [0xB0 | channel, this.parameters[index], value], time); 
       }

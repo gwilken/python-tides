@@ -28,6 +28,12 @@
     cursor: pointer;
   }
 
+  .tempo-range {
+    .range-label {
+      min-width: 4rem;
+      margin-left: 5px;
+    }
+  }
 
 }
 
