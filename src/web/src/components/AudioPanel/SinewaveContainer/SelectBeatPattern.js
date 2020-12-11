@@ -14,9 +14,9 @@ const SelectBeatPattern = ({id}) => {
 
   return (
     <div className="custom-select pattern-select">
-      <label htmlFor="beat-select">Pattern</label>
+      {/* <label htmlFor="beat-select">Pattern</label> */}
       <select 
-        name="beat-select"
+        className="beat-select"
         value={ value }
         onChange={ (e) => handleSelection(e.target.value) }>
 

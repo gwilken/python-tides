@@ -36,6 +36,7 @@ const SinewaveContainer = ({ sines }) => {
   let ranges = useSelector(state => state.ranges);
   let notes = useSelector(state => state.notes);
   let enables = useSelector(state => state.enables);
+  let run = useSelector(state => state.run)
 
   let beatRefs = {};
   let setOutputDisplay = {};
@@ -146,23 +147,23 @@ const SinewaveContainer = ({ sines }) => {
 
       requestId = requestAnimationFrame(loop);
       
-      sines.forEach((data, index) => {
-        let repeat = repeatRefs.current[index].current;
-        // (1000 - globalSpeed) because 1000 is max of input range and we want 
-        // speed to increase as value does, so we subtract max value to flip it.
-        let xOffset = (globalTime / (1000 - globalSpeed)) % (100 / repeat);
-        translateXRefs.current[index].current = xOffset;
-        divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
-      })
+      if (run) {
+        sines.forEach((data, index) => {
+          let repeat = repeatRefs.current[index].current;
+          // (1000 - globalSpeed) because 1000 is max of input range and we want 
+          // speed to increase as value does, so we subtract max value to flip it.
+          let xOffset = (globalTime / (1000 - globalSpeed)) % (100 / repeat);
+          translateXRefs.current[index].current = xOffset;
+          divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
+        })
+      }
 
       while (noteScheduler.notesInQueue.length && noteScheduler.notesInQueue[0].time < globalTime) {
         let currentNote = noteScheduler.notesInQueue.splice(0,1);
         let { index } = currentNote[0];
   
-        console.log( currentNote[0])
-
         // this is to avoid the animation racing to catch up to current time 
-        // after tab has been throttled due to chrome background tab policy
+        // after tab has been throttled due to chrome background timer policy
         if (elapsed < 1000) {
           if (beatRefs[index]) {
             setTimeout(() => {
@@ -220,7 +221,7 @@ const SinewaveContainer = ({ sines }) => {
 
   schedulerWorker.onmessage = function(e) {
     // we only need to calc midi values when we schedule them
-    if (e.data === 'tick') {
+    if (run && e.data === 'tick') {
       let midiValues = sines.map((data, index) => {
         return [returnMidiValueNow(index), index]
       })

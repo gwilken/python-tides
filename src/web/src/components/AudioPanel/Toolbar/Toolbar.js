@@ -1,4 +1,6 @@
 
+
+import ButtonRun from './ButtonRun'
 import SelectSpeed from './SelectSpeed'
 import SelectDevice from './SelectDevice'
 import SelectTempo from './SelectTempo'
@@ -13,6 +15,7 @@ const Toolbar = () => {
 
   return (
     <div className="toolbar">
+      <ButtonRun />
       <SelectSpeed />
       <SelectTempo />
       <SelectDevice />

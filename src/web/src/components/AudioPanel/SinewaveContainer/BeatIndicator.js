@@ -18,19 +18,19 @@ const BeatIndicator = ({id, onMount}) => {
 
   let enables = useSelector(state => state.enables);
   let beatSelections = useSelector(state => state.beatSelections[id]);
-
-  let mouse;
+  let windowSize = useSelector(state => state.windowSize);
+  let run = useSelector(state => state.run)
 
   let dispatch = useDispatch();
+
+  let mouse;
+  let hoveredIndex;
+
 
   useEffect(() => {
     onMount([id, beatRef]);
   }, [onMount, id]);
 
-
-  let hoveredIndex;
-
-  // let { beat } = beatRef.current;
 
 
   function redrawCanvas() {
@@ -51,9 +51,14 @@ const BeatIndicator = ({id, onMount}) => {
         contextRef.current.fillStyle = 'whitesmoke';
       }
 
+      else if (!run) {
+        contextRef.current.fillStyle = '#ececec';
+      }
+
       else {
         contextRef.current.fillStyle = '#ececec';
       }
+
       contextRef.current.fillRect(((beatWidth.current + 3) * i), 0, beatWidth.current, height.current); 
     }
   }
@@ -64,7 +69,8 @@ const BeatIndicator = ({id, onMount}) => {
     let lastBeat;
 
     //// INITIAL DRAW SETUP //////
-    contextRef.current = canvasRef.current.getContext('2d', { alpha: false });
+    // contextRef.current = canvasRef.current.getContext('2d', { alpha: false });
+    contextRef.current = canvasRef.current.getContext('2d');
     setComputedHeight(window.getComputedStyle(canvasRef.current).getPropertyValue('height').slice(0, -2));
     setComputedWidth(window.getComputedStyle(canvasRef.current).getPropertyValue('width').slice(0, -2));
     
@@ -83,7 +89,9 @@ const BeatIndicator = ({id, onMount}) => {
     redrawCanvas();
 
     function loop() {
-      requestId = requestAnimationFrame(loop);
+      if (run) {
+        requestId = requestAnimationFrame(loop);
+      }
 
       let { beat } = beatRef.current;
       
@@ -100,7 +108,7 @@ const BeatIndicator = ({id, onMount}) => {
       cancelAnimationFrame(requestId);
     }
     // eslint-disable-next-line
-  }, [computedWidth, computedHeight, beatSelections])
+  }, [computedWidth, computedHeight, beatSelections, windowSize])
 
 
 

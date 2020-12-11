@@ -1,30 +1,30 @@
 const beatArr = [
   {
-    label: 'one and a half',
+    label: 'one and a half note',
     value: 1.5
   },
   {
-    label: 'whole',
+    label: 'whole note',
     value: 1
   },
   {
-    label: 'half',
+    label: 'half note',
     value: 0.5
   },
   {
-    label: 'quarter',
+    label: 'quarter note',
     value: 0.25
   },
   {
-    label: 'eighth',
+    label: 'eighth note',
     value: 0.125
   },
   {
-    label: 'sixteenth',
+    label: 'sixteenth note',
     value: 0.0625
   },
   {
-    label: 'thirty-second',
+    label: 'thirty-second note',
     value: 0.03125
   }
 ]

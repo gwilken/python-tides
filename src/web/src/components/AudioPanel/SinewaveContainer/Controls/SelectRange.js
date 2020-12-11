@@ -4,10 +4,12 @@ import { setRange } from '../../../../redux/actions';
 const SelectRange = ({id}) => {
   const dispatch = useDispatch();
   const ranges = useSelector(state => state.ranges)
+  const modes = useSelector(state => state.modes)
 
   return (
       <div className="custom-range select-mode-range">
-        <label htmlFor="range-mode">Notes Spread</label>
+        <label htmlFor="range-mode">
+          { modes[id] === 'NOTE_ON' ? 'Notes' : 'Value' } Spread</label>
         <input 
           name="range-mode"
           type="range"

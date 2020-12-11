@@ -14,9 +14,9 @@ const SelectNoteLength = ({id}) => {
 
   return (
     <div className="custom-select pattern-select">
-      <label htmlFor="note-length-select">Note Length</label>
+      {/* <label htmlFor="note-length-select">Length</label> */}
       <select 
-        name="note-length-select"
+        className="note-length-select"
         value={ value }
         onChange={ (e) => handleSelection(e.target.value) }>
 

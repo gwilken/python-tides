@@ -6,12 +6,11 @@
   justify-content: space-around;
 
   .mode-container {
-    // max-width: 300px;
+    min-width: 17rem;
     display: flex;
     flex: 1;
     flex-direction: column;
     justify-content: space-around;
-    // margin-right: 15px;
     padding: 0 10px;
     border-radius: 3px;
     background-color: white;

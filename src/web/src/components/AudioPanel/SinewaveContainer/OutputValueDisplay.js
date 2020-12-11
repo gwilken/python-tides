@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+
 import MIDI_NOTES from './../../../constants/midi-notes';
 
 
 const OutputValueDisplay = ({id, onMount}) => {
   let [currentBeat, setCurrentBeat] = useState(null);
-  
+  let modes = useSelector(state => state.modes)
+
   useEffect(() => {
     onMount([id, setCurrentBeat]);
   }, [onMount, id]);
@@ -21,10 +24,13 @@ const OutputValueDisplay = ({id, onMount}) => {
         <span className="value"> { note && note.length && note[0].midi && note[0].midi }</span>
         <span className="label">midi</span>
       </div>
-      <div className="value-container">
-        <span className="value"> { note && note.length && note[0].name && note[0].name}</span>
-        <span className="label">english</span>
-      </div>
+
+      { modes[id] === 'NOTE_ON' && 
+        <div className="value-container">
+          <span className="value"> { note && note.length && note[0].name && note[0].name}</span>
+          <span className="label">english</span>
+        </div>
+      }
     </div>
   )
 }

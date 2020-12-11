@@ -10,6 +10,8 @@ const initialState = {
   speed: 250,
   availableDevices: [],
   selectedDevice: '',
+  run: true,
+  globalTime: 0,
   channels: [...new Array(8)].map((val, index) => index),
   modes: [...new Array(8)].map(elem => 'NOTE_ON'),
   parameters: [...new Array(8)].map(elem => 0x03),
@@ -163,6 +165,12 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         noteLengths: [...newNoteLengths]
+      }
+
+    case 'run/set':
+      return {
+        ...state,
+        run: action.payload.allowRun
       }
   
 

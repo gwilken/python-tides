@@ -185,4 +185,11 @@ export const setNoteLength = ({id, length}) => ({
   }
 }) 
 
+export const setRunAllow = ({allowRun}) => ({
+  type: 'run/set',
+  payload: {
+    allowRun
+  }
+}) 
+
 
