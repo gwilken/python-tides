@@ -47,7 +47,9 @@ def geojson_stations(data):
     "features": []
   }
 
-  for item in data:
+  filtered = [item for item in data if item["harcon_id"]]
+
+  for item in filtered:
     collection["features"].append({
       "type": "Feature",
       "geometry" : {
@@ -63,6 +65,9 @@ def geojson_stations(data):
       "id": id
     })
     id += 1
+
+  pp(len(collection["features"]))
+  # pp(len(filtered))
 
   with open('stations.geojson', 'w') as f:
     f.write(json.dumps(collection))
