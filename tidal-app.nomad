@@ -3,7 +3,7 @@ job "tidal-app" {
   datacenters = ["dc1"]
 
   group "tidal" {
-    count = 3
+    count = 1
 
     task "tidal-app" {
       driver = "docker"
@@ -14,14 +14,17 @@ job "tidal-app" {
       }
 
       config {
-        image = "registry.gwilken.com/tidal-app:latest"
+        image = "registry.gwilken.com/tidal:latest"
+        args = [
+          "python", "server.py"
+        ]
         ports = ["http"]
       }
     }
 
     network {
       port "http" {
-        // static = 9999
+        // static = 5000
         host_network = "public"
         // host_network = "private"
       }
