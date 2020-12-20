@@ -7,7 +7,7 @@ const initialState = {
   harmonics: [],
   selectedStation: null,
   tempo: 120,
-  speed: 250,
+  speed: 900,
   availableDevices: [],
   selectedDevice: '',
   run: true,
@@ -19,7 +19,7 @@ const initialState = {
   notes: [...new Array(8)].map(elem => 69),
   values: [...new Array(8)].map(elem => 0),
   currentBeats: [...new Array(8)].map(elem => 0),
-  enables: [...new Array(8)].map(elem => true),
+  enables: [true, true, true, false, false, false, false, false],
   beatSelections: [...new Array(8)].map(elem => [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true]),
   noteLengths: [...new Array(8)].map(elem => 0.25)
 };

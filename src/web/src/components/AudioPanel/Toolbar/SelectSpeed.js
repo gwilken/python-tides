@@ -13,10 +13,10 @@ const SelectSpeed = () => {
         name="global-speed"
         type="range"
         min="1"
-        max="990"
+        max="3000"
         step="1"
         value={ speed }
-        onChange={ (e) => dispatch(setSpeed(e.target.value)) } />
+        onChange={ (e) => dispatch(setSpeed(parseInt(e.target.value))) } />
     </div>
   )
 }

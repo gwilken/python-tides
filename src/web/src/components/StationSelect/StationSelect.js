@@ -34,11 +34,8 @@ const StationSelect = () => {
           <img 
             src={collapsed ? expand : collapse} 
             alt="expand and collapse map" />
-        
         </div>
-
         <Map />
-
       </div>
     </div>
   )

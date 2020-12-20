@@ -96,7 +96,9 @@ const BeatIndicator = ({id, onMount}) => {
       let { beat } = beatRef.current;
       
       if (beat !== lastBeat) {
-        redrawCanvas();
+        setTimeout(() => {
+          redrawCanvas();
+        }, 0)
       }
 
       lastBeat = beat;

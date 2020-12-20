@@ -17,8 +17,17 @@ const SelectRange = ({id}) => {
           max="127"
           value={ ranges[id] }
           step="1"
+          list="steplist-octaves"
           onChange={ (e) => dispatch(setRange({id, range: e.target.value})) }
         />
+        <datalist id="steplist-octaves">
+          <option>12</option>
+          <option>24</option>
+          <option>36</option>
+          <option>48</option>
+          <option>60</option>
+          <option>72</option>
+        </datalist>
         <div className="range-label">
           { ranges[id] }
         </div>

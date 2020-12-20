@@ -15,7 +15,7 @@ const AudioPanel = () => {
     const max = Math.max(...amps)
     const min = Math.min(...amps)
 
-    sines = filtered.slice(0, 2).map(sine => {
+    sines = filtered.slice(0, 8).map(sine => {
       let normalizedAmp = normalize(sine.amplitude, max, min)
       sine.amplitude = normalizedAmp
       return sine
