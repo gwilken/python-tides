@@ -25,7 +25,7 @@ class Map extends Component {
   }
 
   componentDidMount() {
-    fetch('/stations/stations.geojson')
+    fetch('./stations/stations.geojson')
       .then(res => res.json())
       .then(data => {
         this.props.setStations(data);

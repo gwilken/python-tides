@@ -13,14 +13,14 @@ import ButtonEnable from './ButtonEnable';
 import './SinewaveContainer.scss';
 
 let globalTime;
-let globalTimeWorker = new Worker('/webworkers/globaltime-worker.js');
+let globalTimeWorker = new Worker('./webworkers/globaltime-worker.js');
 globalTimeWorker.postMessage('start')
 
 globalTimeWorker.onmessage = function(e) {
   globalTime = e.data;
 }
 
-let schedulerWorker = new Worker('/webworkers/scheduler-worker.js');
+let schedulerWorker = new Worker('./webworkers/scheduler-worker.js');
 let lastGlobalTime;
 
 const SinewaveContainer = ({ sines }) => {
