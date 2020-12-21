@@ -24,7 +24,7 @@ job "tidal-app" {
 
     network {
       port "http" {
-        // static = 5000
+        static = 8081
         host_network = "public"
         // host_network = "private"
       }
