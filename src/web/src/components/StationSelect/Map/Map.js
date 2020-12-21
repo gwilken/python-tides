@@ -25,7 +25,7 @@ class Map extends Component {
   }
 
   componentDidMount() {
-    fetch('/stations/stations.geojson')
+    fetch('./stations/stations.geojson')
       .then(res => res.json())
       .then(data => {
         this.props.setStations(data);
@@ -138,7 +138,7 @@ class Map extends Component {
 
     let { properties } = station;
     let { harcon_id } = properties;
-    let url = `/harmonics/${harcon_id}.json`;
+    let url = `./harmonics/${harcon_id}.json`;
     
     fetch(url)
       .then(res => res.json())
