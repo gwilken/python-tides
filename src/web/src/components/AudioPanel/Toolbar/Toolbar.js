@@ -15,15 +15,10 @@ const Toolbar = () => {
 
   return (
     <div className="toolbar">
-      <ButtonRun />
       <SelectSpeed />
       <SelectTempo />
       <SelectDevice />
-      
-      {/* <div onClick={ () => setGlobalRun(!globalRun)}>
-        { globalRun ? 'all stop' : 'run' }
-      </div> */}
-    
+      <ButtonRun />
     </div>
   )
 }

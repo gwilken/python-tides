@@ -1,10 +1,11 @@
-import './StationSelect.scss';
-
-import Map from './Map/Map';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCollapsed } from '../../redux/actions';
+
+import Map from './Map/Map';
+
 import collapse from './collapse.svg';
-import expand from './expand2.svg';
+import expand from './expand.svg';
+import './StationSelect.scss';
 
 const StationSelect = () => {
   const collapsed = useSelector(state => state.collapsed);

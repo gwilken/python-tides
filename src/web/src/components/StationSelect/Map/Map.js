@@ -9,7 +9,7 @@ import {
   setCollapsed } from '../../../redux/actions';
 import mapboxgl from 'mapbox-gl';
 
-let initialCenter = {lng: -79.09460554196545, lat: 28.475889863700047}
+let initialCenter = {lng: -118.48960876464866, lat: 33.43430647341873};
 
 const mapStateToProps = state => {
   return { 
@@ -39,9 +39,13 @@ class Map extends Component {
       container: this.mapContainer,
       style: 'mapbox://styles/gwilken/cjxwljb4b1kt51cl63y6wzr0w',
       center: initialCenter,
-      zoom: 6
+      zoom: 11
     });
  
+    this.map.on('error', e => {
+      console.log('map error', e)
+    })
+
     this.map.on('mousemove', 'markers', this.handleMarkerHover)
 
     this.map.on('mouseleave', 'markers', this.handleMarkerHoverLeave)
@@ -129,11 +133,16 @@ class Map extends Component {
       offset: [-40, 10],
       zoom: 11
     });
+
+    console.log(this.map.getCenter(), this.map.getZoom())
   }
 
 
   updateHarmonics = (station) => {
     // TODO: loading states, error states
+    console.log(station)
+    window.station = station;
+
     this.props.setSelectedStation(station)
 
     let { properties } = station;

@@ -25,10 +25,8 @@ const AudioPanel = () => {
 
   return (
     <div className="audio-panel">
-      { sines.length && <SinewaveContainer sines={ sines } /> }
-
       <Toolbar />
-    
+      { sines.length && <SinewaveContainer sines={ sines } /> }
     </div>
   )
 }
