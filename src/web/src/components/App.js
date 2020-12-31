@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { setWindowSize } from '../redux/actions';
 import { setVisibilityState } from '../redux/actions';
 
+import FlashMessage from './FlashMessage/FlashMessage';
 import InfoBar from './InfoBar/InfoBar';
 
 import { debounce } from './../scripts/utils';
@@ -31,9 +32,12 @@ function App() {
 
   return (
     <div className="fullscreen-container">
+      <FlashMessage />
+      
       <Suspense fallback={<div>loading...</div>}>
         <StationSelect />
       </Suspense>
+
 
       <Suspense fallback={<div>loading...</div>}>
         <AudioPanel />  

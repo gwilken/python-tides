@@ -27,7 +27,7 @@ const InfoModal = ({handleClick}) => {
           like Logic Pro X and Pro Tools, or output to an external device like a Euro Rack modular system.</p>
 
       <h2>What are Tidal Harmonics?</h2>
-      <p>This web app maps tidal harmonics to MIDI values to facilitate the creation of unique and interesting musical compositions. It provides a number of simple tools to help shape the output: global tempo control, a simple step sequencer, the ability to center and control the range of values around a particular note.</p>
+      <p>very brief intro into harmonics blah blah blah...</p>
       
       <div className="animation-container">
         <Sum className="wave-sum" />

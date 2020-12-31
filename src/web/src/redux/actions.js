@@ -177,6 +177,7 @@ export const setBeatSelections = ({id, beats}) => ({
   }
 }) 
 
+
 export const setNoteLength = ({id, length}) => ({
   type: 'noteLength/set',
   payload: {
@@ -184,6 +185,7 @@ export const setNoteLength = ({id, length}) => ({
     length
   }
 }) 
+
 
 export const setRunAllow = ({allowRun}) => ({
   type: 'run/set',
@@ -193,3 +195,15 @@ export const setRunAllow = ({allowRun}) => ({
 }) 
 
 
+export const setFlashMessage = ({message}) => ({
+  type: 'flashMessage/setMessage',
+  payload: {
+    message
+  }
+}) 
+
+
+export const setShowFlashMessage = (bool) => ({
+  type: 'flashMessage/setShow',
+  payload: bool
+}) 

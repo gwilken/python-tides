@@ -1,6 +1,5 @@
 from collections import defaultdict
 from pprint import pp
-import mido
 import matplotlib.pyplot as plt
 import numpy as np
 from time import process_time, process_time_ns
@@ -82,39 +81,41 @@ def normalize(data):
 
 
 def graph_sines(data):
-  fig = plt.figure(figsize=(10, 8))
+  # fig = plt.figure(figsize=(20, 16))
+  # fig = plt.figure(figsize=(20, 2))
+  # ax = plt.gca()
+  # ax.spines['bottom'].set_position('center')
+  # ax.spines['left'].set_position('center')
+  # plt.ylim([-2.75, 2.75])
+  # plt.xlim([0, 1.5])
+  # plt.axis('off')
 
-  # x = np.arange(0, np.pi, 0.001)
-
-  x = np.arange(0, 1, 0.001)
+  x = np.arange(0, 1.5, 0.001)
 
   waves = []
   left = 0
+  bottom = 0
   width = 1
-  height = 1 / ( len(data) + 1)
+  # height = 1 / ( len(data) + 1)
+  height = 1
 
   for index, c in enumerate(data):
+    fig = plt.figure(figsize=(20, 2))
+    ax = plt.gca()
+    ax.spines['bottom'].set_position('center')
+    ax.spines['left'].set_position('center')
+    plt.ylim([-2.75, 2.75])
+    plt.xlim([0, 1.5])
+    plt.axis('off')
     y = sine(c, x)
     waves.append(y)
-    bottom = 1 - ((index + 1) / (len(data) + 1) + 0.025)
-    # bottom = 1 - ((index + 1) / (len(data) ) + 0.025)
-    rect = [left, bottom, width, height]
-    plt.ylim([-1.7, 1.7])
-    plt.axis('off')
-    fig.add_axes(rect)
-    # plt.hlines(0, 0, 1, color='black',  lw=.1)
+    ax.plot(x, y, color='white', lw=1)
+    fig.savefig(f"wave-{index}.svg", transparent=True, bbox_inches='tight')
 
-    plt.plot(x, y, lw=0.5)
+  plt.autoscale(False)
+  # ax.plot(x, sum(waves), lw=2, color='#0e85ea')
+  # fig.savefig('sum.svg', transparent=True, bbox_inches='tight')
 
-  plt.ylim([-1.7, 1.7])
-
-  rect = [left, 0.0, width, height]
-  plt.axis('off')
-  fig.add_axes(rect)
-  # plt.hlines(0, 0, 1, color='black',  lw=.1)
-  plt.plot(x, sum(waves), lw=0.75, color='red')
-  plt.axis('off')
-  plt.show()
 
 
 def scatter(values):
@@ -164,11 +165,6 @@ def dots(data):
   plt.show()
 
 
-def play():
-  msg = mido.Message('note_on', note=60)
-  outport = mido.open_output()
-  outport.send(msg)
-
 
 all_harmonics = parse(tide_data, tide_categories)
 
@@ -211,53 +207,5 @@ phases = [ x['phase'] for x in sort_category(all_harmonics, 'phase') ]
 # dots(phase_amp)
 
 
-# graph_sines(amp_harmonics[:10])
-
-print(phases)
-# print(process_time_ns())
-
-# 580657000
-
-msg = mido.Message('note_on', note=60)
-
-outport = mido.open_output()
-
-scale = 100_000
-
-vals = [int(x * scale) for x in phases]
-
-print(vals)
-
-count = 0
-l = 0
-
-while(True):
-  # t = process_time_ns()
-  count += 1
-  l += 1
-
-  for val in vals:
-    if (l == val):
-      print(val / scale)
-      outport.send(msg)
-
-
-  if (count % (360 * scale)  == 0):
-    print('loop')
-    l = 0
-
-
-  # print(t)
-
-  # if (count != 1 and count % (3600 * scale) == 1):
-  #   l = 1
-  #   print('loop')
-
-
-  # for val in vals:  
-  #   if (l % (val * scale) == 0):
-  #     print(val)
-
-
-
+graph_sines(amp_harmonics[:8])
 

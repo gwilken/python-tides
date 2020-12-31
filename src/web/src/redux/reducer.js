@@ -403,12 +403,14 @@ const initialState = {
   modes: [...new Array(8)].map(elem => 'NOTE_ON'),
   parameters: [...new Array(8)].map(elem => 0x03),
   ranges: [...new Array(8)].map(elem => 24),
-  notes: [...new Array(8)].map(elem => 69),
+  notes: [105, 93, 81, 69, 57, 45, 33, 21],
   values: [...new Array(8)].map(elem => 0),
   currentBeats: [...new Array(8)].map(elem => 0),
   enables: [true, true, true, false, false, false, false, false],
   beatSelections: [...new Array(8)].map(elem => [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true]),
-  noteLengths: [...new Array(8)].map(elem => 0.25)
+  noteLengths: [...new Array(8)].map(elem => 0.25),
+  flashMessage: '',
+  showFlashMessage: false
 };
 
 
@@ -559,8 +561,19 @@ const reducer = (state = initialState, action) => {
         ...state,
         run: action.payload.allowRun
       }
-  
 
+    case 'flashMessage/setMessage':
+      return {
+        ...state,
+        flashMessage: action.payload.message
+      }
+
+    case 'flashMessage/setShow':
+      return {
+        ...state,
+        showFlashMessage: action.payload
+      }
+  
     default:
       return state;
   }

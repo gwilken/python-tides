@@ -5,33 +5,11 @@
   }
   
   5% {
-    opacity: 0;
+    opacity: 1;
   }
 
   15% {
     opacity: 1;
-  }
-
-  85% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes fadeOutAndIn {
-  0% {
-    opacity: 1;
-  }
-  
-  10% {
-    opacity: 0.4;
-  }
-
-  70% {
-    opacity: 0.4;
   }
 
   100% {
@@ -41,84 +19,84 @@
 
 
 @keyframes move0 {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     transform: translateY(0px);
   }
-  20%, 80% {
+  20%, 100% {
     transform: translateY(95px);
 
   }
 }
 
 @keyframes move1 {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     transform: translateY(0px);
   }
-  20%, 80% {
+  20%, 100% {
     transform: translateY(157px);
   }
 }
 
 @keyframes move2 {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     transform: translateY(0px);
   }
-  20%, 80% {
+  20%, 100% {
     transform: translateY(200px);
   }
 }
 
 @keyframes move3 {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     transform: translateY(0px);
   }
-  20%, 80% {
+  20%, 100% {
     transform: translateY(230px);
   }
 }
 
 @keyframes move4 {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     transform: translateY(0px);
   }
-  20%, 80% {
+  20%, 100% {
     transform: translateY(255px);
   }
 }
 
 @keyframes move5 {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     transform: translateY(0px);
   }
-  20%, 80% {
+  20%, 100% {
     transform: translateY(280px);
   }
 }
 
 @keyframes move6 {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     transform: translateY(0px);
   }
-  20%, 80% {
+  20%, 100% {
     transform: translateY(305px);
   }
 }
 
 @keyframes move7 {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     transform: translateY(0px);
   }
-  20%, 80% {
+  20%, 100% {
     transform: translateY(330px);
   }
 }
 
 
 @keyframes color {
-  0%, 10%, 90%, 100% {
+  0%, 10% {
     stroke: #0E85EA;
   }
-  20%, 80% {
+  20%, 100% {
     stroke: hotpink;
   }
 }
@@ -207,12 +185,12 @@
           &.wave-#{$i} {
             g polyline {
               stroke: #0E85EA;
-              animation: color 6s 2s infinite alternate;
+              animation: color 5s 2s 1 normal forwards;
             }
 
             animation: 
-              fadeIn 6s #{2 + ($i * .1)}s infinite alternate, 
-              move#{$i} 6s 2s infinite alternate;
+              fadeIn 5s #{2 + ($i * .1)}s 1 normal forwards, 
+              move#{$i} 5s 2s 1 normal forwards;
 
 
             // animation: fadeIn 6s 2s infinite alternate, move#{$i} 6s 2s infinite alternate;

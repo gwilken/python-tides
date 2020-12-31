@@ -1,0 +1,33 @@
+.flash-message-container {
+  background-color: hotpink;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+  color: white;
+  transition: height .4s;
+  height: 2.5rem;
+
+  .message {
+    font-size: 1rem;
+    transition: opacity .4s;
+  }
+
+  .close-button {
+    position: absolute;
+    right: 1rem;
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    transition: opacity .4s;
+  }
+
+  &.hidden {
+    height: 0px;
+
+    .message, .close-button {
+      opacity: 0;
+    }
+  }
+}
