@@ -11,6 +11,9 @@
   .message {
     font-size: 1rem;
     transition: opacity .4s;
+    text-align: center;
+    margin: 0 6rem;
+    line-height: 1.2rem;
   }
 
   .close-button {
@@ -21,6 +24,7 @@
     padding: 0;
     cursor: pointer;
     transition: opacity .4s;
+    // text-decoration: underline;
   }
 
   &.hidden {

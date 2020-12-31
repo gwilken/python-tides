@@ -21,7 +21,11 @@ const useMidiOutputs = () => {
         },
       (err) => console.log('Something went wrong', err));
     } else {
-      dispatch(setFlashMessage({message: 'Hey! It looks like your browser doesn\'t support webMIDI. Try this app on Chrome or Edge to be able to output MIDI data.' }))
+      dispatch(setFlashMessage({message: `
+        Hey! It looks like your browser doesn\'t 
+        support webMIDI. Try this app in Chrome or Edge 
+        on the desktop to be able to output MIDI data.`}))
+
       dispatch(setShowFlashMessage(true));
     }
   // eslint-disable-next-line

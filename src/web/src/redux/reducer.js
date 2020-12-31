@@ -403,7 +403,7 @@ const initialState = {
   modes: [...new Array(8)].map(elem => 'NOTE_ON'),
   parameters: [...new Array(8)].map(elem => 0x03),
   ranges: [...new Array(8)].map(elem => 24),
-  notes: [105, 93, 81, 69, 57, 45, 33, 21],
+  notes: [87, 81, 75, 69, 63, 57, 51, 45],
   values: [...new Array(8)].map(elem => 0),
   currentBeats: [...new Array(8)].map(elem => 0),
   enables: [true, true, true, false, false, false, false, false],
