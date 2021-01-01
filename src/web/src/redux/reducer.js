@@ -406,7 +406,7 @@ const initialState = {
   notes: [87, 81, 75, 69, 63, 57, 51, 45],
   values: [...new Array(8)].map(elem => 0),
   currentBeats: [...new Array(8)].map(elem => 0),
-  enables: [true, true, true, false, false, false, false, false],
+  enables: [true, true, true, true, false, false, false, false],
   beatSelections: [
     [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true],
     [false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true],
@@ -550,16 +550,19 @@ const reducer = (state = initialState, action) => {
       }
 
     case 'beatSelections/set':
-      let newBeatSelections = state.beatSelections;
+      let newBeatSelections = [...state.beatSelections];
+
       newBeatSelections[action.payload.id] = action.payload.beats;
+
       return {
         ...state,
-        beatSelections: [...newBeatSelections]
+        beatSelections: newBeatSelections
       }
 
     case 'noteLength/set':
       let newNoteLengths = state.noteLengths;
       newNoteLengths[action.payload.id] = action.payload.length;
+
       return {
         ...state,
         noteLengths: [...newNoteLengths]

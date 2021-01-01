@@ -7,7 +7,3 @@ WORKDIR /home/appuser
 COPY --chown=appuser:appgroup . .
 
 RUN pip install -r requirements.txt
-
-# USER appuser
-
-# ENTRYPOINT [ "sh", "./entrypoint.sh" ]

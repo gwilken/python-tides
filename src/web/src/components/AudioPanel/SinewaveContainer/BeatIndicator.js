@@ -18,6 +18,7 @@ const BeatIndicator = ({id, onMount}) => {
 
   let enables = useSelector(state => state.enables);
   let beatSelections = useSelector(state => state.beatSelections[id]);
+
   let windowSize = useSelector(state => state.windowSize);
   let run = useSelector(state => state.run)
 
@@ -30,7 +31,6 @@ const BeatIndicator = ({id, onMount}) => {
   useEffect(() => {
     onMount([id, beatRef]);
   }, [onMount, id]);
-
 
 
   function redrawCanvas() {

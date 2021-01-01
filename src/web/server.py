@@ -4,16 +4,12 @@ from markupsafe import escape
 import json
 import os
 
-ENV = os.getenv('FLASK_ENV')
 PORT = os.getenv('PORT', default=5000)
 
 app = Flask(__name__)
 
-######### ROUTES BELOW ###########
 
-@app.context_processor
-def get_env():
-  return dict(env=ENV)
+######### ROUTES BELOW ###########
 
 @app.route('/')
 def home():
@@ -54,5 +50,3 @@ def pong():
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=PORT)
 
-
-    

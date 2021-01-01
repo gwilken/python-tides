@@ -8,7 +8,8 @@ const SelectBeatPattern = ({id}) => {
   let dispatch = useDispatch();
 
   function handleSelection(index) {
-    dispatch(setBeatSelections({id, beats: patterns[index].pattern} ));
+    let pattern = [...patterns[index].pattern];
+    dispatch(setBeatSelections({id, beats: pattern} ));
     setValue(index)
   }
 

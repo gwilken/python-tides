@@ -32,12 +32,21 @@ const InfoBar = () => {
         </div>
       }
 
+      <div>
+        <a href="https://github.com/gwilken/tidal">GitHub</a>
+      </div>
+
       <div className="info-button"
         onClick={ () =>  handleClick() }>
           What is this?
       </div>
+
       <div>
-        <a href="https://github.com/gwilken/tidal">GitHub</a>
+        How do I use this?
+      </div>
+
+      <div>
+        What are Harmonic Constituents? (NOAA)
       </div>
     </div>
   )
