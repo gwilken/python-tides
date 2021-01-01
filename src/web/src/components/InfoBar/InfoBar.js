@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux'
-import { setRunAllow } from '../../redux/actions';
+// import { useSelector, useDispatch } from 'react-redux'
+// import { setRunAllow } from '../../redux/actions';
 
 import InfoModal from './InfoModal';
 
@@ -9,17 +9,17 @@ import './InfoBar.scss';
 
 const InfoBar = () => {
   const [showInfo, toggleShowInfo] = useState(false);
-  let run = useSelector(state => state.run)
-  const dispatch = useDispatch();
+  // let run = useSelector(state => state.run)
+  // const dispatch = useDispatch();
 
   function handleClick() {
-    if (run && !showInfo) {
-      dispatch( setRunAllow({allowRun: false}) );
-    }
+    // if (run && !showInfo) {
+    //   dispatch( setRunAllow({allowRun: false}) );
+    // }
     
-    if (!run && showInfo) {
-      dispatch( setRunAllow({allowRun: true}) );
-    }
+    // if (!run && showInfo) {
+    //   dispatch( setRunAllow({allowRun: true}) );
+    // }
     
     toggleShowInfo(!showInfo);
   }

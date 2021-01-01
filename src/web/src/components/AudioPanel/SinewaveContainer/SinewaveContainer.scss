@@ -18,6 +18,10 @@
     overflow: hidden;
     margin-right: 7px;
 
+    .overlay {
+      position: absolute;
+    }
+
     .read-head {
       position: absolute;
       width: 2px;

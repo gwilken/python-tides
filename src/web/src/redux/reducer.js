@@ -407,7 +407,16 @@ const initialState = {
   values: [...new Array(8)].map(elem => 0),
   currentBeats: [...new Array(8)].map(elem => 0),
   enables: [true, true, true, false, false, false, false, false],
-  beatSelections: [...new Array(8)].map(elem => [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true]),
+  beatSelections: [
+    [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true],
+    [false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true],
+    [false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, true],
+    [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true],
+    [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true],
+    [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true],
+    [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true],
+    [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true],
+  ],
   noteLengths: [...new Array(8)].map(elem => 0.25),
   flashMessage: '',
   showFlashMessage: false

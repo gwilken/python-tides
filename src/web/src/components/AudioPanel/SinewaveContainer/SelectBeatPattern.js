@@ -4,7 +4,7 @@ import { setBeatSelections } from '../../../redux/actions';
 import patterns from '../../../constants/beat-patterns';
 
 const SelectBeatPattern = ({id}) => {
-  let [value, setValue] = useState(2);
+  let [value, setValue] = useState();
   let dispatch = useDispatch();
 
   function handleSelection(index) {
@@ -19,6 +19,8 @@ const SelectBeatPattern = ({id}) => {
         className="beat-select"
         value={ value }
         onChange={ (e) => handleSelection(e.target.value) }>
+
+        <option selected="true" disabled="disabled">pattern</option>
 
         { patterns.map((pattern, index) => (
           <option 

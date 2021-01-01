@@ -22,9 +22,9 @@ const useMidiOutputs = () => {
       (err) => console.log('Something went wrong', err));
     } else {
       dispatch(setFlashMessage({message: `
-        Hey! It looks like your browser doesn\'t 
+        Hey! It looks like your browser doesn't 
         support webMIDI. Try this app in Chrome or Edge 
-        on the desktop to be able to output MIDI data.`}))
+        on the desktop to be able to output MIDI data to your favorite software or hardware.`}))
 
       dispatch(setShowFlashMessage(true));
     }

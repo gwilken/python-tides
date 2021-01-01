@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { normalize } from '../../../scripts/utils';
 import noteScheduler from '../../../scripts/NoteScheduler';
 
+import SineInfoOverlay from './SineInfoOverlay';
 import BeatIndicator from './BeatIndicator';
 import Controls from './Controls/Controls';
 import OutputValueDisplay from './OutputValueDisplay';
@@ -23,13 +24,17 @@ globalTimeWorker.onmessage = function(e) {
 let schedulerWorker = new Worker('./webworkers/scheduler-worker.js');
 let lastGlobalTime;
 
+
 const SinewaveContainer = ({ sines }) => {
   const wrapperRefs = useRef(sines.map(() => createRef()));
+  // const hudRefs = useRef(sines.map(() => createRef()));
+  // const hudContextRefs = useRef(sines.map(() => createRef()));
   const divRefs = useRef(sines.map(() => createRef()));
   const repeatRefs = useRef(sines.map(() => createRef()));
   const translateXRefs = useRef(sines.map(() => createRef()));
   const sinesDataArr = useRef(sines.map(() => createRef()));
   const computedWidths = useRef(sines.map(() => createRef()));
+  const computedHeights = useRef(sines.map(() => createRef()));
 
   let windowSize = useSelector(state => state.windowSize);
   let globalSpeed = useSelector(state => state.speed);
@@ -40,6 +45,7 @@ const SinewaveContainer = ({ sines }) => {
 
   let beatRefs = {};
   let setOutputDisplay = {};
+  let setSineOverlayValue = {};
 
   useEffect(() => {
     /////// DRAW SETUP START //////////
@@ -48,10 +54,16 @@ const SinewaveContainer = ({ sines }) => {
     // we'll use css tranform translateX instead of redrawing every frame for best performance
     sines.forEach((data, index) => {
       const wrapper = wrapperRefs.current[index].current;
-      const computedHeight = window.getComputedStyle(wrapper).getPropertyValue('height').slice(0, -2);
-      const computedWidth = window.getComputedStyle(wrapper).getPropertyValue('width').slice(0, -2);
+      // const hud = hudRefs.current[index].current;
+      const computedHeight = parseFloat(window.getComputedStyle(wrapper).getPropertyValue('height').slice(0, -2));
+      const computedWidth = parseFloat(window.getComputedStyle(wrapper).getPropertyValue('width').slice(0, -2));
 
-      computedWidths.current[index].current = parseFloat(computedWidth);
+      computedWidths.current[index].current = computedWidth;
+      computedHeights.current[index].current = computedHeight;
+
+      // also setup canvas that will overlay range, realtime data
+      // hud.width = computedWidth;
+      // hud.height = computedHeight;
 
       const canvas = document.createElement('canvas');
       const canvasContext = canvas.getContext('2d', { alpha: false });
@@ -81,13 +93,13 @@ const SinewaveContainer = ({ sines }) => {
       // we want width of final div to be at least triple the wrapper div's width
       // and repeat pattern without getting cutting off
       let canvasWidth = (computedWidth * 3) + (tempWidth - ((((computedWidth * 3) / tempWidth) % 1) * tempWidth));
-      canvas.width = canvasWidth
+      canvas.width = canvasWidth;
 
       // save num of repeats. will need for animation later.
       let numOfRepeats = canvasWidth / tempWidth;
-      repeatRefs.current[index].current = numOfRepeats
+      repeatRefs.current[index].current = numOfRepeats;
 
-      canvas.height = height
+      canvas.height = height;
 
       canvasContext.fillStyle = '#badefd';
       canvasContext.rect(0, 0, canvasWidth, height);
@@ -151,12 +163,13 @@ const SinewaveContainer = ({ sines }) => {
       
       if (run) {
         sines.forEach((data, index) => {
+          // let hudContext = hudContextRefs.current[index].current;
           let repeat = repeatRefs.current[index].current;
           // (1000 - globalSpeed) because 3000 is max of input range and we want 
           // speed to increase as value does, so we subtract max value to flip it.
           let xOffset = (globalTime / (3000 - globalSpeed)) % (100 / repeat);
           translateXRefs.current[index].current = xOffset;
-          divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)'
+          divRefs.current[index].current.style.transform = 'translateX(-' + translateXRefs.current[index].current  + '%)';
         })
       }
 
@@ -178,6 +191,12 @@ const SinewaveContainer = ({ sines }) => {
               setOutputDisplay[index](currentNote[0]);
             }, 0);
           }
+
+          if (setSineOverlayValue[index]) {
+            setTimeout(() => {
+              setSineOverlayValue[index](currentNote[0]);
+            }, 0);
+          }
         }
       }
 
@@ -190,14 +209,15 @@ const SinewaveContainer = ({ sines }) => {
       cancelAnimationFrame(requestId);
     }
     // eslint-disable-next-line
-  }, [globalSpeed, enables, windowSize, setOutputDisplay, sines])
+  }, [globalSpeed, enables, windowSize, setOutputDisplay, sines, notes])
 
 
   useEffect(() => {
     schedulerWorker.postMessage('start')
   }, [])
 
-  // return value of sinewave[index] based on current time
+
+  // return midi value of sinewave[index] based on current time
   function returnMidiValueNow(index) {
     let canvasWidth = computedWidths.current[index].current;
     let clampedMidiValue;
@@ -238,11 +258,14 @@ const SinewaveContainer = ({ sines }) => {
     beatRefs[id] = beatRef;
   }
 
-
   const onOutputDisplayMount = ([id, setCurrentBeat]) => {
     setOutputDisplay[id] = setCurrentBeat;
   }
 
+
+  const OnSineOverlayMount = ([id, setCurrentValue]) => {
+    setSineOverlayValue[id] = setCurrentValue;
+  }
 
   return (
     <div>
@@ -252,6 +275,8 @@ const SinewaveContainer = ({ sines }) => {
             className="sinewave-container"
             key={'sinecontainer-' + index}>
             <div className="canvas-wrapper" ref={ wrapperRefs.current[index] }>
+              <SineInfoOverlay onMount={OnSineOverlayMount} id={index} />
+              
               <div 
                 className={`sine-div ${enables[index] ? '' : 'disabled'}`} 
                 ref={ divRefs.current[index] }></div>
