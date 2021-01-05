@@ -17,7 +17,7 @@ const SineInfoOverlay = ({id, onMount}) => {
   }
 
   if (centerNote && range) {
-    highRange = centerNote + Math.floor(range / 2);
+    highRange = (centerNote + Math.floor(range / 2)) - 1;
     lowRange = centerNote - Math.floor(range / 2);
   }
 

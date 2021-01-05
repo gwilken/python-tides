@@ -1,5 +1,6 @@
 .flash-message-container {
-  background-color: hotpink;
+  // background-color: hotpink;
+  background: linear-gradient(90deg,hotpink 1.56%,rgb(233, 59, 146));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,12 +19,30 @@
 
   .close-button {
     position: absolute;
-    right: 1rem;
-    font-size: 1rem;
+    right: 24px;
+    // top: 16px;
+    border: none;
+    background: none;
     margin: 0;
     padding: 0;
-    cursor: pointer;
-    transition: opacity .4s;
+    z-index: 2;
+    opacity: .75;
+    transition: opacity .15s;
+
+    path {
+      stroke: white;
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+    // position: absolute;
+    // right: 1rem;
+    // font-size: 1rem;
+    // margin: 0;
+    // padding: 0;
+    // cursor: pointer;
+    // transition: opacity .4s;
     // text-decoration: underline;
   }
 

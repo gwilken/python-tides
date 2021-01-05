@@ -3,6 +3,7 @@ import { useState } from 'react';
 // import { setRunAllow } from '../../redux/actions';
 
 import InfoModal from './InfoModal';
+import HowToModal from './HowToModal';
 
 import './InfoBar.scss';
 
@@ -28,25 +29,29 @@ const InfoBar = () => {
     <div className="info-bar-container">
       { showInfo && 
         <div>
-          <InfoModal handleClick={handleClick} />
+          {/* <InfoModal handleClick={handleClick} /> */}
+          <HowToModal handleClick={handleClick} />
         </div>
       }
 
       <div>
-        <a href="https://github.com/gwilken/tidal">GitHub</a>
+        <a target="_blank" rel='noopener noreferrer' href="https://github.com/gwilken/tidal">GitHub</a>
       </div>
 
       <div className="info-button"
-        onClick={ () =>  handleClick() }>
+        onClick={ () => handleClick() }>
           What is this?
       </div>
 
-      <div>
-        How do I use this?
+      <div className="howto-button"
+        onClick={ () => handleClick() }>
+        How would I use this?
       </div>
 
       <div>
-        What are Harmonic Constituents? (NOAA)
+        <a target="_blank" rel='noopener noreferrer' href='https://tidesandcurrents.noaa.gov/about_harmonic_constituents.html'>
+          What are Harmonic Constituents? (NOAA)
+        </a>
       </div>
     </div>
   )

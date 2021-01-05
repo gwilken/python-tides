@@ -82,13 +82,13 @@ def normalize(data):
 
 def graph_sines(data):
   # fig = plt.figure(figsize=(20, 16))
-  # fig = plt.figure(figsize=(20, 2))
-  # ax = plt.gca()
-  # ax.spines['bottom'].set_position('center')
-  # ax.spines['left'].set_position('center')
-  # plt.ylim([-2.75, 2.75])
-  # plt.xlim([0, 1.5])
-  # plt.axis('off')
+  fig = plt.figure(figsize=(20, 2))
+  ax = plt.gca()
+  ax.spines['bottom'].set_position('center')
+  ax.spines['left'].set_position('center')
+  plt.ylim([-2.75, 2.75])
+  plt.xlim([0, 1.5])
+  plt.axis('off')
 
   x = np.arange(0, 1.5, 0.001)
 
@@ -100,17 +100,17 @@ def graph_sines(data):
   height = 1
 
   for index, c in enumerate(data):
-    fig = plt.figure(figsize=(20, 2))
-    ax = plt.gca()
-    ax.spines['bottom'].set_position('center')
-    ax.spines['left'].set_position('center')
-    plt.ylim([-2.75, 2.75])
-    plt.xlim([0, 1.5])
-    plt.axis('off')
+    # fig = plt.figure(figsize=(20, 2))
+    # ax = plt.gca()
+    # ax.spines['bottom'].set_position('center')
+    # ax.spines['left'].set_position('center')
+    # plt.ylim([-2.75, 2.75])
+    # plt.xlim([0, 1.5])
+    # plt.axis('off')
     y = sine(c, x)
-    waves.append(y)
-    ax.plot(x, y, color='white', lw=1)
-    fig.savefig(f"wave-{index}.svg", transparent=True, bbox_inches='tight')
+    # waves.append(y)
+    ax.plot(x, y, color='hotpink', lw=1)
+    fig.savefig(f"overlay-{index}.svg", transparent=True, bbox_inches='tight')
 
   plt.autoscale(False)
   # ax.plot(x, sum(waves), lw=2, color='#0e85ea')
