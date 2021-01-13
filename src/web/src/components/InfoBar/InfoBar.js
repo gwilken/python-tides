@@ -10,27 +10,27 @@ import './InfoBar.scss';
 
 const InfoBar = () => {
   const [showInfo, toggleShowInfo] = useState(false);
-  // let run = useSelector(state => state.run)
-  // const dispatch = useDispatch();
+  const [showHowTo, toggleShowHowTo] = useState(false);
 
-  function handleClick() {
-    // if (run && !showInfo) {
-    //   dispatch( setRunAllow({allowRun: false}) );
-    // }
-    
-    // if (!run && showInfo) {
-    //   dispatch( setRunAllow({allowRun: true}) );
-    // }
-    
+  function handleShowClick() {
     toggleShowInfo(!showInfo);
+  }
+
+  function handleHowClick() {
+    toggleShowHowTo(!showHowTo);
   }
 
   return (
     <div className="info-bar-container">
       { showInfo && 
         <div>
-          {/* <InfoModal handleClick={handleClick} /> */}
-          <HowToModal handleClick={handleClick} />
+          <InfoModal handleClick={ handleShowClick } />
+        </div>
+      }
+  
+      { showHowTo && 
+        <div>
+          <HowToModal handleClick={ handleHowClick } />
         </div>
       }
 
@@ -39,12 +39,12 @@ const InfoBar = () => {
       </div>
 
       <div className="info-button"
-        onClick={ () => handleClick() }>
+        onClick={ () => handleShowClick() }>
           What is this?
       </div>
 
       <div className="howto-button"
-        onClick={ () => handleClick() }>
+        onClick={ () => handleHowClick() }>
         How would I use this?
       </div>
 

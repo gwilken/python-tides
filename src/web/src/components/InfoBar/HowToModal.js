@@ -1,5 +1,4 @@
 import midi00 from './images/mac-midi-00.png';
-import midi01 from './images/mac-midi-01.png';
 import midi02 from './images/mac-midi-02.png';
 import midi03 from './images/mac-midi-03.png';
 import midi04 from './images/mac-midi-04.png';
@@ -49,22 +48,22 @@ const HowToModal = ({handleClick}) => {
         
         <h3>Run 'Audio MIDI Setup'</h3>
 
-        <img className="howto-image" src={midi00} />
+        <img className="howto-image" src={midi00} alt="howto 1" />
 
         {/* <img className="howto-image" src={midi01} /> */}
 
         <h3>Once opened, click Window in the menu bar and select 'Show MIDI Studio' from the dropdown</h3>
 
-        <img className="howto-image" src={midi02} />
+        <img className="howto-image" src={midi02} alt="howto 2" />
 
         <h3>Double click the IAC Driver icon, and make sure 'Device is online' is checked</h3>
         
-        <img className="howto-image" src={midi03} />
+        <img className="howto-image" src={midi03} alt="howto 3" />
 
         <h2>Using it with Logic Pro X</h2>
 
         <h3>In Project Settings, under Recording, enable 'Auto demux by channel...' to make sure you can record each channel separately on it's own track.</h3>
-        <img className="howto-image" src={midi04} />
+        <img className="howto-image" src={midi04} alt="howto 4" />
 
         <p></p>
         

@@ -1,6 +1,6 @@
 {
-  "name": "app",
-  "version": "0.1.0",
+  "name": "tidal-harmonies",
+  "version": "0.1.2",
   "private": true,
   "homepage": ".",
   "dependencies": {
