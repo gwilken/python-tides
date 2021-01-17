@@ -39,6 +39,11 @@ def static_js(filename):
 def static_media(filename):
     return send_from_directory('./build/static/media', filename)
 
+@app.route('/images/<path:filename>')
+def static_media(filename):
+    return send_from_directory('./build/images', filename)
+
+
 @app.route('/ping')
 def pong():
   return 'Pong!'
