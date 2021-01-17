@@ -25,4 +25,4 @@ More info about the harmonics of tides at [Theory of Tides](https://en.wikipedia
 
 The tidal harmonic and station data was pulled from a NOAA api: `https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/`
 
-The scripts used to scrape, extract, transform, and load can be found in `src/data`
+The scripts used to scrape, extract, transform, and load the data can be found in `src/data`
