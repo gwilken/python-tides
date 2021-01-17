@@ -21,3 +21,8 @@ More info about the harmonics of tides at [Theory of Tides](https://en.wikipedia
 
 ![tidal harmonic diagram](https://github.com/gwilken/tidal/blob/master/src/web/public/images/harmonic.gif?raw=true)
 
+## Data sources
+
+The tidal harmonic and station data was pulled from a NOAA api: `https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/`
+
+The scripts used to scrape, extract, transform, and load can be found in `src/data`
