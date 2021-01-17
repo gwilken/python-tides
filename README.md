@@ -7,7 +7,14 @@ This web app maps tidal harmonics to MIDI values to facilitate the creation of u
 
 ![screen shot of tidal harmonics webapp](https://gwilken.com/tidal/images/screen-shot-01.png "screen shot 1")
 
+### Select a tide station and explore it's tidal harmonics
+
+![screen shot of tidal harmonics webapp 2](https://gwilken.com/tidal/images/screen-shot-02.png "screen shot 2")
+
+
 ## What are Tidal Harmonics?
 Tides are created by the gravitational forces of the Moon and Sun, acting upon the waters of the Earth. Those gravitational forces change as the relative positions of the Earth, Sun, and Moon change. Each of these motions or “constituents” can be described mathmatically as a cosine curve.
 
 ## 
+
+
