@@ -40,7 +40,7 @@ def static_media(filename):
     return send_from_directory('./build/static/media', filename)
 
 @app.route('/images/<path:filename>')
-def static_media(filename):
+def get_images(filename):
     return send_from_directory('./build/images', filename)
 
 
